@@ -1,0 +1,48 @@
+<head><title>Chuck Moore's 25x Forth Multicomputer Chip</title>
+<meta name="description" content="A parallel computer with 25 computers on a chip. An on-chip network goes off-chip to array even more computers.">
+<meta name="keywords" content="microcomputer, microprocessor, parallel, network, array, memory, coprocessors">
+</head><body bgcolor="#d0ffd0">
+
+Updated 2001 June
+<br><a href="index.html">colorForth Home Page</a>
+<h1>25x Microcomputer</h1>
+An array of 25 microcomputers on a 7 sq mm die.
+
+<h1>Features</h1><ul>
+<li>.2 sq mm asynchronous microcomputer core
+<li>5 x 5 array of cores: 60,000 Mips
+<li>5 horizontal, 5 vertical parallel interconnect buses: 180 Ghz bandwidth
+<li>Specialized computers to interface off-chip.
+<li>Max power 500 mW @ 1.8 V, with 25 computers running
+<li>100mAh battery life is 1 year, with 1 computer running throttled
+<li>64-pin SOIC: mirrored pin-out to 4ns cache SRAM
+<li>Array chips on 2-sided PCB</ul>
+
+<h1>Description</h1>
+Availability of the tiny (.2 sq mm), asynchronous <a href="X18.html">X18 microcomputer core</a> naturally suggested arraying it on a chip. Its extremely low power (20 mW) made that feasible. A 5x5 array was chosen to fit on a 7 sq mm die, the smallest available prototype, though larger arrays are possible. 25 computers running at 2400 Mips is a total of 60,000 Mips. An unlimited supply.
+
+<p>Communication among the computers is provided by a network with 5 horizontal and 5 vertical buses. Each computer has 2 bus registers to access a horizontal and a vertical bus. Each bus is 18-bits wide and can run at 1 GHz. All 10 buses can be active at once connecting a 20-computer subset. So total bandwidth is 180 GHz.
+
+<p>Each computer can customized. Registers are added to the 16 processors at the edge of the array and connected to package pins. Each computer is responsible for a particular interface. Protocols are implemented with software.<ul>
+<li>SRAM controller
+<li>Flash controller
+<li>4 serial controllers
+<li>USB controller
+<li>D/A controller
+<li>A/D controller</ul>
+After booting from ROM, the computers await code downloaded from one of these interfaces.
+
+<h1>Pinout</h1>
+Chosen to be the mirror image of an 18-bit cache memory chip. This is the fastest memory available, with 4 ns access. Its package is a 100-pin SOIC. The 18-bit Multicomputer thus has 256K words of external memory in 1 chip.
+
+<p>Putting the Multicomputer chip on the top of a 2-sided PCB and the SRAM chip on the bottom gives a very small footprint. A decoupling capacitor is the only other component needed. An array of such pairs is a multicomputer board. Connecting Multicomputer to SRAM is trivial, with mm traces. Routing for power and a serial network is also easy. Computers load code from the network.
+
+<p>A parallel computer with 60Gips nodes! Power is determined by the SRAM.
+
+<h1>Cost/Availability</h1>
+The chip is awaiting funding. If interested, contact <a href="mailto:chipchuck@mindspring.com">chipchuck@mindspring.com</a>
+
+<p>A 7 sq mm die, packaged, will cost about $1 in quantity 1,000,000. Cost per Mip is 0.
+
+<p>25 prototypes can be obtained from <a href="http://www.mosis.com/">MOSIS</a> for $14,000 with 16 week turn-around. The TSMC .18um process has monthly submissions.
+</body>

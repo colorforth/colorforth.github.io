@@ -1,0 +1,166 @@
+<title>Chuck Moore's VLSI Chip and Transistor Simulator</title>
+<meta name="description" content="Transistors and nets are extracted from the layout. The difference equations for current and voltage are integrated. Results are plotted and displayed.">
+<meta name="keywords" content="current, voltage, temperature, charge, capacitance, layout, extraction, body-effect, models, SPICE">
+</head><body bgcolor="#d0ffd0">
+
+<h1> Simulation </h1>
+Armed with transistor and net tables, the program can simulate the chip. It applies 5 Volts to the power pins and computes the consequences. There is no need for the elaborate procedure used by <a href="spice.html">SPICE</a>. Simply integrate the set of differential (difference) equations with integer arithmetic using the indicated units:<pre><b>
+     equation            units
+     dQ = I(V,T) dt      aC = uA ps
+     V = Q/C             mV = aC/fF
+     dT = f(T-Te) dt     uK</b></pre>
+
+First compute the current thru each transistor, adjusted for temperature. Add the resulting charge to input and output nets. Change the temperature depending on the amount it differs from power equilibrium. Then compute the voltage on each net from its charge and capacitance. Repeat indefinitely.
+
+<h2>Transistors and nets </h2>
+The first step in simulating a layout is to identify the transistors and the nets by which they're connected. The i21st has 16,000 transistors and 5000 nets (roughly 3 transistors/net). Each transistor is characterized by a drive and each net by a load.
+
+<p>To speed net identification, the program first traces the largest nets, core power and ground. It starts at the input pad and uses a recursive algorithm to follow the trace through metal and diffusion, branching as required. It marks each tile with a flag:<pre><b>
+     01 - power
+     10 - ground
+     00 - neither</b></pre>
+
+It then scans the poly layer and locates transistors where poly crosses diffusion. It measures their size by following the poly trace. It then identifies the nets for source, gate and drain. It can distinguish source and drain only when source is core power or ground. The result is 2 tables:<pre><b>
+       TRAN: +0  Source net index
+             +2  Gate net
+             +4  Drain net
+             +6  Drive (uA)
+   LOCATION: +0  Lower-left gate tile</b></pre>
+
+To identify a net that is not power or ground, it follows the trace, recursively when it forks, changing layers as needed. It does 2 things:
+
+<p>1 - Computes capacitance (to substrate) depending upon the layer:<pre><b>
+     diffusion  3 fF/tile
+          gate  5
+          poly  .4
+         metal  .3
+       metal-2  .5</b></pre>
+
+These numbers can be calculated from process parameters, but are best measured by an on-chip test circuit.
+
+<p>2 - Looks for a tile bit indicating the 'owner' of the net. If it finds an owner bit while on a plausible layer, it searches an 4-byte table to identify the net:<pre><b>
+    ANCHOR: +0  Location of owner
+       NET: +0  Capacitance (fF)
+            +4  Coupled charge (aC)</b></pre>
+
+The net is the one whose location matches the current position.
+
+<p>Lacking an owner indicates a new net. An entry is created, with the owner being the location the search was started. The layer is important. For example, a metal trace might cross a poly owner, yet be on a different net. Since the owner bit does not identify the layer, it is determined by these rules:<pre><b>
+     Not metal-2
+     Not metal if over poly or diffusion</b></pre>
+
+Transistor gates are owned by poly, source or drain by diffusion. Pads are owned by metal.
+
+<p>A table of coupling capacitance is constructed:<pre><b>
+     G_D: +0 Gate net
+          +2 Drain or source net
+          +4 Capacitance</b></pre>
+
+<p>Transistors with the same gate and drain are combined (inverters) and only significant coupling retained.
+
+<p>Clearly this process takes some time (10 s). A scan of the entire layout looks for transistors. Another scan looks for resistors. These are drawn as a 1-tile wide, vertical n-well.
+
+<h2> Integration </h2>
+2 arrays are used to store current values. For each net:<pre><b>
+     IV: +0 Voltage (mV)
+         +2 Previous voltage
+         +4 Charge (aC)</b></pre>
+For each transistor:<pre><b>
+     TK: +0 Temperature (uK, actually 2*20)
+         +4 kS (um)</b></pre>
+
+<h3>Current</h3>
+For each transistor, current is computed from gate, source and drain voltages. It's corrected for temperature by a table-lookup for the factor<pre><b>
+     (Ta/T)*1.5</b></pre>
+Chip temperature is only 2 K above ambient, which may be specified (298 K). This current times 7.8 ps is the charge added to the drain net and subtracted from the source net. The current thru a p-transistor is negative.
+
+<h3><a href="temperature.html"> Temperature</a></h3>
+<p>Current is multiplied by voltage across the transistor to get power (p). This is summed for all transistors to get total chip power. It is also used to compute an equilibrium temperature proportional to energy density<pre><b>
+     Te = (p dt)/kS</b></pre>
+If temperature is below equilibrium, it is approached exponentially, increasing by<pre><b>
+     a (Te-T)</b></pre>
+
+ If above, it is decreased by<pre><b>
+     b (T-Te)*3</b></pre>
+
+This approximates diffusion decay of t*.5 (square-root time). Coefficients a and b must be measured. Temperature rises rapidly (ps) and falls slowly (ns).
+
+<h3><a href="edge.html">Coupling</a></h3>
+<p>The effect of coupling capacitance is to change the charge and thus the voltage on both nets. The equations for drain to gate are:<pre><b>
+     Qd = Vd Cd + (Vd-Vg)Cgd
+     Vd(Cd+Cgd) = Qd + Vg Cgd</b></pre>
+
+So to the drain charge we add the gate voltage times the coupling capacitance. And conversely. Scanning the coupling table applies all significant effects. Coupling charge must be stored separately from net charge since it changes independently. Several gates may contribute to the same drain.
+
+<h3>Voltage</h3>
+<p>Finally, a voltage is computed for each net by dividing charge (plus coupling charge) by capacitance. This is extrapolated by using previous voltage, to the time for the next current calculation. In fact, this extrapolation leads to instability in small-capacitance nets and is neglected.
+
+<p>The time step of 7.8 ps resulted from the plotting convenience of 4x32 steps to 1 ns. It can't be larger because of small-capacitance voltage instability. To avoid most of these, series transistors are specially treated. There remain the internal nets of Schmitt inverters and some others.
+
+<h2> Transistor model </h2>
+The transistor model evolves toward increased accuracy. The current model is described here. Basically source-drain current is a function of source, drain, gate and body voltages<pre><b>
+     Ids = f(Vd,Vs,Vg,Vb)</b></pre>
+
+variations of the Ebers-Moll model are usually used by SPICE simulators. But this model is too elaborate to calculate for 10,000 transistors. We use a 3-parameter empirical model adjusted to fit the measured Ids curves for a particular process. Even this model is best computed by table-lookup, inorder to minimize computation time.
+
+<p>The first approximation is to write the current as a product<pre><b>
+     Ids = D(Vd,Vs)G(Vg)</b></pre>
+
+This separation is not strictly accurate, but close enough. Body voltage is +0 for n-transistors and +5 for p-. It has no other function.
+
+<p><img src="ivn1.gif" align="right">The IV curves look like this for a 1-tile n-transistor. The green curves are D vs Vd for Vg = 1, 2, 3, 4 and 5 V. The red curve is G vs Vg. Although the green curves should run to 5 V, we can't measure them. All available information is provided and the leaf-like symmetry is attractive.
+
+<p>The black dots are measured values. The green curves have been corrected for temperature and represent cold a transistor. The difficulty in relating dots to curves emphasizes the huge difference temperature makes.
+
+<p clear="right"><img src="ivp.gif" align="right">The IV curves for a 2-tile p-transistor. It suggests that 3-tile transistors would better match the n-transistor curve. The dots show the p-transistors less affected by temperature, because of their lower current density.
+
+<p>G is computed by a clumsy exponential converging to linear. It is best considered a table look-up of the red curve. There are 300 values between 0-6 V at 20 mV increments.
+
+<p>D is computed as the parallel combination of 2 linear functions. Again, it is a table look-up with the same characteristics as G. Vs is +0 (or +5).
+
+<p>When Vs is not the same as Vb, SPICE includes a "body effect" correction. A more accurate treatment of this effect is to observe that<pre><b>
+     <a href="body.html">Ids = Id0 - Is0</a></b></pre>
+
+Thus the form used becomes<pre><b>
+     Ids = (D(Vd)-D(Vs))G(Vg)</b></pre>
+
+<p>This product form can be effectively used to compute the current thru <a href="series.html">series transistors</a>.
+
+<h2> Interconnect </h2>
+
+<h3>Gate capacitance</h3>
+The largest MOS capacitance. It has plate and edge contributions. Also a voltage dependence: low capacitance till threshold. However, a simple average capacitance per tile is an adequate approximation. If Vdd varies from 3-5 V, a linear variation can be added.
+
+<h3>Trace capacitance</h3>
+A much smaller MOS capacitance to substrate. Voltage dependence is ignored. There is plate capacitance determined by area, and edge capacitance determined by length. Their contributions are roughly equal in size and relatively insensitive to shape (straight, corner, tee, contact). The combination is even insensitive to trace width. It is approximated by an average capacitance per tile.
+
+
+<h3>Cross capacitance</h3>
+Coupling between traces is neglected.
+
+<h3>Diffusion capacitance</h3>
+Has plate and edge contributions, and a different and smaller voltage dependence. It is approximated by an average capacitance per tile. A linear variation with Vdd is added if 3-5 V range is required. p-diffusion is larger than n- by about 50%.
+
+<h3>Measured capacitance</h3>
+Is provided by some fabricators. It agrees with calculations to 10%. However, measurements with our on-chip test circuit differ by 20%.
+
+<h3>Resistance</h3>
+As with any model, unnecessary detail is ignored. Thus, trace resistance is neglected relative to a transistor:<pre><b>
+     Polysilicon    80 Ohms/tile
+    Polysilicide     8
+     n-diffusion    35
+     p-diffusion    70
+           metal      .02
+          n-well   700  
+      transistor  5000</b></pre>
+
+Non-metal traces must be kept short enough that this assumption is valid.
+
+<h2> Inverter </h2><img src="sim.gif" align="right">
+This is a portion of the screen shown when an inverter is simulated. The lower trace is input, the upper is output and at the top is the output vs input voltage plot. The dark rectangle is 2 ns wide by 2.5 V high.
+
+<p>There are several interesting features in this display. Note the output is delayed from the input, perhaps 200 ps. The rise/fall time of the output is faster than the input. The output load is small enough that the inverter has some gain (in this sense).
+
+<p>The output vs input plot shows considerable hysteresis. This is typical of these relatively small gates. It's due to the fast transition and the time required to charge the output capacitance. The curve is not symmetrical because of the difference between n- and p-transistors. Textbooks don't include these effects.
+
+<p>The slight rise just before output falls is due to gate-drain capacitance. It is so small as to be negligible, as is its effect on rise/fall time. SPICE models claim a larger effect.

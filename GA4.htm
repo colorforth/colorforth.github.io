@@ -1,0 +1,111 @@
+<h1 align="center">GA4 4-computer Chip</h1><h3>
+
+The GA4, although having only 4 computers, is the most advanced of GreenArrays' chips, so its features will be described. The other chips will be upgraded to this standard.
+
+<p>The chip measures 1 sq mm in a 180 nm process. Price will be very low. Prototypes, if we're lucky, in a few months.
+
+<p>Fine-granularity means many computers each running simple code; probably with a low duty-cycle. We expect multiple chips in a typical application so the incremental cost of one more is negligible.
+
+<p>Apologies to those unfamiliar with GreenArrays' architecture. Low power results from our computer (one node of an array) being asynchronous (unclocked). Spec sheets will be forthcoming. Meanwhile this list of features should prove impressive.
+
+<p>GA4 has 12 pads; 8 will be bonded out with the standard 2x2 mm, 8-pin package<ul>
+<li>Pin 1, Pad 1, serial in/out
+<li>Pin 2, Pad 3, Vdd (1.8 V)
+<li>Pin 3, Pad 5, serial in
+<li>Pin 4, Pad 6, serial out
+<li>Pin 5, Pad 7, digital in/out
+<li>Pin 6, Pad 8, digital in/out
+<li>Pin 7, Pad 11, D/A out
+<li>Pin 8, Pad 12, A/D in
+<li>DAP, Pad 4, Vss</ul>
+DAP is a ground pad/heat sink on the bottom of the package.
+
+<p>The chip can be repackaged for different applications. The package we have chosen for testing brings all 12 pads to corresponding pins, but is 3x3 mm:<ul>
+<li>Pin 1, serial in/out
+<li>Pin 2, digital in/out
+<li>Pin 3, Vdd (1.8 V)
+<li>Pin 4, Vss
+<li>Pin 5, serial in
+<li>Pin 6, serial out
+<li>Pin 7, digital in/out
+<li>Pin 8, digital in/out
+<li>Pin 9, digital in/out
+<li>Pin 10, digital in/out
+<li>Pin 11, D/A out
+<li>Pin 12, A/D in
+<li>DAP, Vss</ul>
+
+<p>The 4 computers are assigned nominal functions based upon their ROM and I/O pads:<ul>
+<li>Node 00, asynchronous boot<ul>
+<li>Pad 5, asynchronous (RS232) in; 1-wire in/out (wake)
+<li>Pad 6, asynchronous out</ul>
+<li>Node 01, SPI boot<ul>
+<li>Pad 7, data in (wake)
+<li>Pad 8, clock
+<li>Pad 9, -chip enable
+<li>Pad 10, data out</ul>
+<li>Node 10, 1-wire boot<ul>
+<li>Pad 1, 1-wire in/out/reset(wake)
+<li>Pad 2, digital in/out</ul>
+<li>Node 11, analog<ul>
+<li>Pad 11, D/A out
+<li>Pad 12, A/D in</ul>
+</ul>
+
+<h2>Features</h2><ul>
+<li>3 pF I/O pad capacitance (inclusive of ESD) 
+<li>1.8V Vdd +- 10%
+<li>3 mA per node that's running; 100 nA if sleeping (leakage)
+<li>Powers-up in reset<ul>
+   <li>Draws no power
+   <li>First positive edge on pin 1 takes chip out of reset</ul>
+<li>Implements the <a href="inst.htm">colorForth instruction set</a>
+
+<p><li>Serial communication<ul>
+<li>A pulse-width modulation protocol has been adopted. A wide positive pulse (1.8V) indicates a 1, a narrow pulse a 0
+<li>A 1-wire serial connection. It can be capacitively or optically coupled
+<li>The current software implementation runs at 30 Mbs. Planned hardware serdes can be 10x faster
+<li>The serial node is asleep while waiting for a pulse, drawing no power
+<li>One chip in an application can convert standard protocols (RS232, SPI, I2S, USB, Ethernet, CAN bus, etc.) to 1-wire
+<li>One chip in an application can boot from Flash and in turn boot a daisy-chain of chips
+<li>Chips can communicate via the daisy-chain, or multiple daisy chains</ul>
+
+<p><li>D/A out<ul>
+<li>9-bits of scaled current into a 75Ohm load
+<li>Range from 0 to 1.5 V
+<li>Moderate non-linearity correctable with software or op-amp
+<li>Drivers designed to minimize glitches
+<li>About 30mA max current (TBD)
+<li>75Ohm internal pull-down (bit 9 of IOCS) can provide a voltage output
+<li>Pull-down allows no-connect of pin</ul>
+
+<p><li>A/D in<ul>
+<li>VCO with 18-bit counter
+<li>Averages value over sample interval (low-pass filter)
+<li>6-bit resolution at 10 MHz, 17-bit at 10 KHz
+<li>Range from .5 to 1.3 V
+<li>Moderate non-linearity correctable with software
+<li>2 multiplexed inputs: A/D pad and D/A pad
+<li>Triggerable from neighboring node
+<li>Internal calibration at Vdd and Vss
+<li>Internal calibration against D/A (non-linearities of D/A and A/D compound)
+<li>Reset to Vdd input allows no-connect of pin</ul>
+
+<p><li>Digital I/O<ul>
+<li>4 modes for each pad:<ul>
+   <li>Output high (1.8 V)
+   <li>Output low
+   <li>Input
+   <li>Input with weak (50KOhm) pull-down (default at reset)</ul>
+<li>50Ohm output drivers; that's 18 mA max
+<li>Pad connected to bit 17 of IOCS convenient for input (can be tested as sign bit)
+<li>Bit 17 changing can wake up node
+<li>Pull-down allows no-connect of pin</ul> 
+
+<p><li>Wake-up<ul>
+<li>A node can sleep (using no power) by reading the wake-up port. It can wake up when input changes (edge detect)
+<li>Such wake-up synchronizes the node to the input edge, with a  phase jitter of picoseconds. The input node can synchronize other nodes via the internal communication ports
+<li>A node can <em>call</em> the wake-up port address; can execute a multi-port call including wake-up. Upon wake-up, the instructions executed are @b ; (Probably register b was set to IOCS). The instruction word (4 instructions) can be mask-changed for a dedicated application.
+<li>Communication protocol must guarantee against missing an edge</ul>
+
+</ul>

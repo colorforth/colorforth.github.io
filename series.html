@@ -1,0 +1,32 @@
+<h1>Series transistors</h1><img src="series.bmp" align="right">
+Transistors in series pose a recognized problem for simulation. The net between the transistors has a very small capacitance (10% of load). A small change in current can cause a large change in voltage. To avoid this, a small time step is required. Alternatively, the capacitance can be made unrealistically large, with no apparant effect. Actually, this capacitance varies substantially, as transistors switch.
+
+<h2>Model</h2>
+Another approach is to ignore the internal net and compute the current thru the series transistors directly. The desired equation is<pre><b>
+     Id = D(Vd)X(Va,Vb)</b></pre>
+
+X is the function of gate voltages Va and Vb being sought. Observe that the current thru each transistor must be the same. The charge storage possible between them is neglible. So<pre><b>
+     Id = D(Vs)G(Va) = (D(Vd)-D(Vs))G(Vb)</b></pre>
+
+Here Vs is the internal voltage to be eliminated. Rearranging<pre><b>
+     D(Vs)(G(Va)+G(Vb)) = D(Vd)G(Vb)
+     Id = D(Vs)G(Va) = D(Vd)G(Va)G(Vb)/(G(Va)+G(Vb))</b></pre>
+
+Thus X is the parallel combination of G(Va) and G(Vb). Simple enough.
+
+Although derived for 2 transistors, by induction it generalizes to any number. The gate voltages may all be different, but the parallel combination produces the right current. This justifies the product form of the model which provides separation of drain and gate voltages.
+
+<h2>Simulation</h2>
+The extractor recognises series transistors when they occupy adjacent tiles. It assigns a double-size entry in the transistor table formatted as <pre><b>
+     TRAN:  +0  0
+            +2  Gate2 net index
+            +4  Gate3
+            +6  Gate4
+            +8  Source
+           +10  Gate1
+           +12  Drain
+           +14  Drive</b></pre>
+
+The entry from +8 on is the same as a solo transistor. Gate1 is closest to the drain and will be subject to gate-drain capacitance. The other gate-source/drain capacitances are neglected. Clearly the number of transistors in series is limited to 4. If necessary, an extra diffusion tile can be inserted in the layout to allow for more.
+
+<p>The simulator recognizes this entry by the leading 0, where it expects a nonzero Source net index. It computes the parallel combination of the nonzero gates, then proceeds as usual. Note that all transistors are equivalent. The slight speed-up due to charge sharing when Gate1 switches last is lost.

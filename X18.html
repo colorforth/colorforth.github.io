@@ -1,0 +1,89 @@
+<title>Chuck Moore's X18 Forth Microcomputer Core</title>
+<meta name="description" content="A high-performance, low-power microcomputer core. Available as a GDS II file. On-chip memory and stacks. Forth instruction set.">
+<meta name="keywords" content="microprocessor, stacks, push-down stacks, mips, power, low power, instructions, instruction set, DRAM, ROM, watchdog, watchdog timer">
+</head><body bgcolor="#d0ffd0">
+
+Updated 2001 June
+<h1>X18 Microcomputer core</h1>
+High performance, low power Forth engine. Optimized for compute-bound
+portable applications. 18 bit address/data matches cache SRAM.
+
+<h1>Features</h1><ul>
+<li>2400 Mips, sustained
+<li>Asynchronous (no external clock)
+<li>2 16-deep push-down stacks
+<li>27 0-operand instructions
+<li>128 words ROM, 384 DRAM
+<li>Watchdog timer
+<li>20 mW @ 1.8 V
+<li>.2 sq mm</ul>
+
+<h1>Architecture</h1>
+The X18 is an evolution of the F21 and i21 microprocessors. With .18um transistors, it has 5x their speed and 1/5 their power. It has their 16-deep Return and Data stacks and 27 0-operand instructions, packed 3 per word. A 100ms watchdog timer assures continued operation. Boots from on-chip ROM.
+
+<p>Redesigned with new layout and simulation tools to be robust and to minimize power. The computer can be throttled by a factor of 1024 to provide 2.4 Mips using 20 uW. It may be stopped altogether, but will have to reboot.
+
+<p>Multiply (125 Mops) and divide (40 Mops) have been improved. Internal memory is fast enough (1 ns) to sustain 2400 Mips. Data access, especially to external SRAM, will slow this. Code is loaded into on-chip DRAM for execution.
+
+<h1> CPU </h1>
+Forth code is highly factored into many small subroutines. An optimized processor requires an efficient call/return mechanism. This is best achieved with 2 push-down stacks. Each is implemented as a register feeding a 16x18-bit RAM with 8-transistor bit cells. The current entry is indicated by a 16-bit bidirectional, circular shift register.
+
+<p>One stack is used to store subroutine return addresses. All processors have such a stack. The other is used to pass parameters to and from subroutines. Other processors use registers or stack frames for this purpose. However, all languages use an implicit stack to evaluate expressions. Forth makes it explicit.
+
+<p> As if emphasizing their importance, the stacks require 2/3 of the CPU silicon area. It is difficult to achieve their 1-cycle accesss timing.
+
+<p> The merits of stack vs. register designs have been argued for decades. A comprehensive book, <a href="http://www.cs.cmu.edu/~koopman/stack_computers/index.html"><em>Stack Computers,</em></a> by Phil Koopman has been published online. To quote Sec 6.2: "0-operand stack addressing ... makes stack machines superior to conventional machines in the areas of program size, processor complexity, system complexity, processor performance, and consistency of program execution."
+
+<p> The Forth ALU operates on the top 1 or 2 items of the parameter stack, leaving the result there. This permits 0-operand instructions. Eliminating register addresses permits shorter instructions, in this case 5-bit. Several instructions are required to rearrange the stack. And it's convenient to move things to the return stack.
+
+<p> An address register is useful to reduce stack manipulation. It also supports incrementing to address successive words in memory. Similar use of the top of the return stack provides 2 addresses for memory-memory moves.
+
+<p> A demultiplexor allows the packing of up to 3 instructions per word. This increases the density of compiled code and reduces the interference between instruction and data memory access. It keeps the CPU busy while the next instruction is being fetched. Providing a sustained execution speed of 2400 Mips.
+
+<p> This is implemented by a 3-bit shift register. The current bit enables its slot into the instruction latch. A ready pulse from the memory manager latches the high-order 5 bits (slot 0). The pulse is delayed by a string of 14 inverters so that it repeats 2 ns later, latching the next slot. Slot 2 stops the process, as does a jump or fetch/store, until the next ready pulse.
+
+<p> There are 27 simple instructions, exactly suited to Forth. This allows 1-1 compilation of Forth source to machine code. On other processors, each Forth primitive requires several instructions. The situation is reversed for other languages: several Forth instructions may be required for their primitives.
+
+<p><table border>
+<tr><td>...<td>Register
+<tr><td>T<td>Top of stack
+<tr><td>S<td>2nd number on stack
+<tr><td>R<td>Top of Return stack
+<tr><td>A<td>Address</table>
+
+<p>Remember that fetch pushes the stack, store and binary operations pop it.<table border>
+<tr><td>Code<td>Op<td>Action
+<tr><td>0<td>word ;<td>Jump to subroutine; tail recursion
+<tr><td>1<td>if<td>Jump to 'then' if T0-T17 are zero
+<tr><td>2<td>word<td>Call subroutine
+<tr><td>3<td>-if<td>Jump to 'then' if T17 is one
+<tr><td>6<td>;<td>Return
+
+<tr><td>8<td>@r<td>Fetch from address in R
+<tr><td>9<td>@+<td>Fetch from address in A; increment A
+<tr><td>a<td>n<td>Fetch literal
+<tr><td>b<td>@<td>Fetch from address in A
+<tr><td>c<td>!r<td>Store into address in R
+<tr><td>d<td>!+<td>Store into address in A; increment A
+<tr><td>f<td>!<td>Store into address in A
+ 
+<tr><td>10<td>-<td>Ones-complement T
+<tr><td>11<td>2*<td>Shift T left 1 bit
+<tr><td>12<td>2/<td>Shift T right 1 bit; preserve T17
+<tr><td>13<td>+*<td>Add S to T if T0=1 (multiply step)
+<tr><td>14<td>or<td>Exclusive-or S to T
+<tr><td>15<td>and<td>And S to T
+<tr><td>17<td>+<td>Add S to T
+
+<tr><td>18<td>pop<td>Fetch R
+<tr><td>19<td>a<td>Fetch A
+<tr><td>1a<td>dup<td>Duplicate T
+<tr><td>1b<td>over<td>Fetch S
+<tr><td>1c<td>push<td>Store into R
+<tr><td>1d<td>a!<td>Store into A
+<tr><td>1e<td>nop<td>Do nothing
+<tr><td>1f<td>drop<td>Store T nowhere
+nop</table>
+
+<p> Another advantage of the 5-bit instruction is ease of decoding. A tree of NAND and NOR gates lead from the instruction bus to the enable for each register. This is facilitated by the limit of 10 lines to be routed: each bit and its complement.
+</body>

@@ -1,0 +1,90 @@
+<body bgcolor="#d0ffd0">
+Updated June 2001
+<h1> Layout </h1><h3>
+The chip description is used to fill an array of tiles. For example, the i21st microprocessor die is 3.3x4.1 mm. It requires a 1250x1562 array of 2.6 um tiles. Each tile uses 1 32-bit word of memory, so the chip is described in 7.8 Mbytes.
+
+<h1> Layers </h1>
+14 bits are sufficient to describe the 6 layers of a 1-poly, 3-metal process. N-well is indicated by 1 bit. Metal-1 by 2. Diffusion, poly, metal-2 and metal-3 each use 3. 5 other bits are used for housekeeping.
+
+<p>Of the 3 bits, bit 0 indicates a horizontal trace extending from the center of the tile to to the center of the tile to its right. Bit 1 a vertical trace going up. Bit 2 a contact. All 8 combinations are possible in the same tile. Metal-1 does not need the contact bit. Any contact on diffusion, poly or metal-2 implies a contact on metal-1. Likewise, a contact on metal-3 implies one on metal-2.
+
+<p>Diffusion is different. The kind (n+ or p+) depends on the n-well bit. Bit 0 indicates diffusion (p+ in n-well, n+ over substrate), which fills the tile. Bit 1 indicates a contact. Bit 2 a well/substrate contact (reverse diffusion: n+ in n-well, p+ over substrate). The actual assignment is:<ul>
+<li> 0 no diffusion
+<li> 1 diffusion
+<li> 2
+<li> 3 diffusion contact
+<li> 4
+<li> 5 substrate contact
+<li> 6
+<li> 7 diffusion contact ignored during net extraction</ul>
+Type 7 is needed to avoid a loop when recursively tracing paths between multiply-connected metal and diffusion.
+
+
+<p> These bits are formatted in a 32-bit word:<table border>
+<tr><td>bit<td><td><td>16<td><td><td><td><td><td><td>0
+<tr><td><td><td>21p<td>s<td>o<td>333<td>222<td>11<td>ppp<td>ddd<td>w</table>
+with:<ul>
+<li> w well
+<li> ddd diffusion
+<li> ppp poly
+<li> 11 metal
+<li> 222 metal-2
+<li> 333 metal-3
+<li> o net owner
+<li> 21p brightening bits</ul>
+
+The display provides 1024x768 pixels with 16-bit colors. A few of these are used:<ul>
+<li> <font color="#c0c000">n-well yellow</font>
+<li> <font color="green">diffusion green</font>
+<li> <font color="red">poly red</font>
+<li> <font color="blue">metal blue</font>
+<li> <font color="#C0C0C0">metal-2 silver</font>
+<li> <font color="cyan">metal-3 cyan</font></ul>
+Bright and dark shades of red, blue and silver identify nets above and below .9 V. For example, bright red is poly at +1.8; dark red is poly at +0.
+
+<p> The layers are stacked in their physical order. They may be peeled off to examine detail otherwise concealed. Transparent colors are not helpful when looking 6 layers deep.
+
+<h1> Editing </h1>
+The <font color="red">color</font><font color="green">Forth</font> Editor is used to edit the chip description. The way gates are placed is determined by GDS. Basically it offers subroutines with 1 parameter, the position.
+
+<p>Routing is described by selecting a layer and distance left, right, up or down. It is somewhat clumsy, but translation to GDS restricts options. The Edit/Compile/Display cycle is so fast that immediate visual feedback is available. Running the simulator provides another check.
+
+<p>The advantage of such manual place and route is that you know what you get. If there is no room for a gate, or if a trace is unfortunately long, the layout can be reconsidered. Such an approach is required for sub-micron designs where interconnect capacitance becomes important. Multiple iterations approach the goal of a clear, modular, compact chip.
+
+<h1> Scaling </h1>
+Each fabricator has a proprietary set of geometric design rules. These take the form of diagrams showing the size, spacing and overlap of each mask layer. To employ a process involves choosing the smallest tile size that conforms to the rules. Most rules are then satisfied by the discipline of the tiled layout. But all must be reviewed for exceptions.
+
+<p>Here are some typical parameters (um):<ul>
+<li> .58 tile size
+<li> .50 n-well overlap p-diffusion
+<li> 1.0 n-diffusion to p-diffusion
+<li> .18 poly width
+<li> .25 poly spaceing
+<li> .20 contact size
+<li> .05 contact overlap
+<li> .22 metal width
+<li> .25 metal spaciang
+<li> .28 metal-2 width
+<li> .25 metal-2 spacing
+<li> .25 via size
+<li> 75 pad width
+<li> 75 pad spacing
+<li> 90 passivation</ul>
+
+Most of these parameters are minima. But optimization requires they be followed as closely as possible. Safety factors have already been included.
+
+<p>Tile size has been limited by these constraints:<ul>
+
+<li><img src="diag.bmp" align="right">Diagonally adjacent contacts are necessary for compact layout. Their minimum spacing is usually the limiting factor, probably in metal-2. This is most reasonably Euclidean spacing (along the diagonal). However sometimes Manhattan spacing is required.
+
+<li><img src="butt.bmp" align="right">Poly spacing between abutting transistors.
+
+<li>Gate layouts have 2 tiles between n and p diffusions.</ul>
+
+Average current is limited by metal width:<ul>
+<li> metal-1 0.5 mA/um
+<li> metal-2 1.0
+<li> metal-3 1.0</ul>
+This is rarely a concern. Especially since peak current is reduced by the duty-cycle. However wide power and pad traces are required.
+
+</body>

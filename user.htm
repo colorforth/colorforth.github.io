@@ -1,0 +1,125 @@
+<body bgcolor="#d0ffd0">
+
+Updated 2001 July 8
+<h1>User Guide</h1><ul>
+<li>Keypad
+<li>Save
+<li>Changing <font color="red">color</font><font color="green">Forth</font>
+<li>Editor
+<li>Arithmetic
+<li>Dump
+<li>File
+<li>Color hexagons
+<li>North bridge</ul>
+
+<h1>Keypad</h1>
+Comfortable to use for it minimizes finger motion. Here is one of the keypads displayed at lower right of the screen. The keys corresponding to these characters are:
+<img src="keys.png" align="right" width="198" height="120"><table border>
+<tr><td>q<td>w<td>e<td>r<td> <td>u<td>i<td>o<td>p
+<tr><td>a<td>s<td>d<td>f<td> <td>j<td>k<td>l<td>;
+<tr><td>z<td>x<td>c<td>v<td> <td>m<td>,<td>.<td>/
+<tr><td><td><td><td><td>n<td>sp<td>alt</table>
+
+Each key executes a word. In this case, the top 24 add their value to the word being typed. The thumb keys have functions:<ul>
+<li>x - cancels the word
+<li>. - ends the word
+<li>* - multiply character, displays keypad with more characters</ul>
+In general,<ul>
+<li>x - cancels or deletes
+<li>. - leaves the current keypad</ul>
+You cannot backspace characters (they've already been packed). Only cancel a word/number and start over. As the word is typed, its packed form is on the stack, displayed at lower left. This is unintentional, the consequence of using the stack while it's being displayed.
+
+<p>That was the second keypad. The home keypad has thumb keys:<ul>
+<li>9 - displays number keypad
+<li>* - displays keypad with more characters</ul>
+The number keypad builds a number as the others build words. The number grows on the stack, displayed at lower left. Its thumb keys provide:<ul>
+<li>- - number to be negative
+<li>f - switch to hex base
+<li>9 - switch to decimal base</ul>
+The number base controls display of the stack. It sticks until changed.
+
+<p>Applications may have their own keypads.
+
+<h1>Save</h1>
+The word 'save ' copies <font color="red">color</font><font color="green">Forth</font> to floppy, starting at sector 0. This floppy is bootable. But not readable by DOS, since it has no FAT tables or directory.
+
+<h1>Changing <font color="red">color</font><font color="green">Forth</font></h1>
+Change it as you like. I'll be changing blocks 0-62. So to allow updates, you might put your code in blocks 64-161.
+
+<p>COLOR.COM only initializes blocks 0-62. Typing '63 99 erase ' will zero blocks 63-161. This readies them for Editor.
+
+<h1>Editor</h1>
+The word 'e ' restarts Editor at its current block. Even blocks are code, odd are documentation. The keypad has all function keys:<ul>
+<li>. - leave Editor. You might first need to leave the insertion keypad with a different .
+<li>+ - scroll block by 2
+<li>- - scroll block by -2
+<li>* - swap between code and documentation
+<li>l - move cursor left 1 word
+<li>u - move cursor up (actually left 8 words)
+<li>d - move cursor down (actually right 8 words)
+<li>r - move cursor right 1 word
+<li>x - delete the word before the cursor
+<li>i - insert a word previously deleted</ul>
+
+These keys select the color of words to be inserted after the cursor. They display an entry keypad from which . returns. <a href="parsed.html">For the meaning of these colors.</a><ul>
+<li>w - white words (execute)
+<li>r - red words (define)
+<li>g - green words (compile)
+<li>m - magenta words (variable)
+<li>c - cyan words (compile macros)
+<li>t - white (text, comment) words
+<li>C - text words with first character capitalized
+<li>S - text words, all caps
+</ul>
+The phrase '60 edit ' starts Editor at block 60.
+
+<p>Outside Editor, the phrase '64 copy ' will copy the current block to block 64. And set 64 as the current block.
+
+<p>Editor has a learning curve. Don't be in a hurry. I find it pleasant to use and refreshingly different from ordinary editors.
+
+<p>The cursor is not changed as you scroll blocks. This is so you can return and find it where you left it. But sometimes it's below the displayed block and invisible. If you don't move it up, you will insert at the bottom, as expected.
+
+<h1>Arithmetic</h1><ul>
+<li>Put a number on the stack
+<li>Toggle between decimal (9) and hex (f)
+<li>Put another number on the stack
+<li>Type + * or /, result on stack
+<li>Define other operators in your block</ul>
+
+<h1>Dump</h1>
+The phrase '0 dump ' displays 16 words starting at location 0. Thereafter, the words u and d scroll up and down. Words are displayed in hex, with address at right. Change words with 'n a ! '.
+
+<h1>File</h1>
+The word 'file ' loads a utility that reads/writes a DOS file. An empty floppy must be initialized by DOS, Windows, Unix:<ul>
+<li>Write a 2KB file FILLER
+<li>Then the file you want to read. Or one longer than you intend to write.</ul>
+This builds the FAT tables and directory. These files will be contiguous. Their names must be 8 characters or less, all caps, to keep the directory simple. FILLER fills-out cylinder 0.
+
+<p>Then the phrase '2000 block get ' will get the size of the file from the directory and read enough cylinders, starting with cylinder 1, into block 2000.
+
+<p>The phrase '0 63 blocks put ' will write the file size (63 blocks) to the directory then write 4 cylinders, starting with cylinder 1, from location 0. This is how I write COLOR.COM.
+
+<p>The basic words 'reads ' and 'writes ' have parameters address, starting cylinder, number of cylinders. You can examine or write any floppy. There's no facility to format a floppy.
+
+<p>One way to update <font color="red">color</font><font color="green">Forth</font> is to run the new COLOR.COM. Mount <font color="red">a copy of</font> your bootable floppy and type '0 0 3 writes '. This updates blocks 0-53.
+
+<h1>Colored hexagons</h1>
+Type 'hex '.
+
+<p>Displays 7 hexagons. Center one has color at top of screen (rgb: 888).
+One to left has less red, to right more red. To upper left less green, to lower right more. To lower left less blue, to upper right more.<ul>
+
+<li>Upper r g b increase rgb of center hex
+<li>Center r g b decrease
+<li>+ and - change amount of increase/decrease
+<li>. escape</ul>
+
+<h1>North Bridge</h1>
+Type 'north ok '
+
+<p>Displays device id and class for all devices.
+<br>Displays 1st 16 registers for selected device.
+
+<p>This is the PCI bus controller. Each device has an address and registers that configure it. Switch between these by choosing devs/regs with the Editor in ok. Devices on my computer are named.
+
+</body>

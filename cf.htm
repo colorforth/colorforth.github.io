@@ -1,0 +1,81 @@
+<title>Chuck Moore's Wonderful colorForth Programming Language and Operating System</title>
+<meta name="description" content="ColorForth is a dialect of Forth that uses color as punctuation. It is a simple, colorful programming language that produces compact, efficient programs. It is also an operating system, running stand-alone on a PC. And a philosophy that leads to tested, reliable applications.">
+<meta name="keywords" content="Forth, software, programming, language, architecture, stack, push-down, LIFO, compact, fast, efficient, reliable, test, PC, computer, operating system, stand-alone">
+</head><body bgcolor="#d0ffd0">
+
+Updated 2009 October
+<br><a href="index.html">colorForth Home Page</a>
+<h1>colorForth</h1>
+Forth has been a recognized programming language since the 1970's. ColorForth is a redesign of this classic language for the 21st century. It also draws upon a 20-year evolution of minimal instruction-set microprocessors. Now implemented to run under Windows, it can also stand-alone without an operating system. Currently being ported to GreenArrays' c18 computer core via the Haypress Creek board. Applications are recompiled from source with a simple optimizing compiler.
+
+<h1>Features</h1><ul>
+<li>Stand-alone! Includes operating system.
+<li>Compact! 2K bytes for core software.
+<li>Fast! Optimized object code.
+<li>Simple! Applications stored as source. No object library.
+<li>Innovative! Text compressed and pre-parsed.
+<li>Unique! 27-key Dvorak keyboard.</ul>
+
+<h1><a href="status.html">Status</a></h1>
+The latest status of <font color="red">color</font><font color="green">Forth</font> and current projects. Others have been more active than I, so search the web.
+
+<h1>Forth</h1>
+Distinctive for its use of 2 push-down stacks. The Return stack is used for subroutine return addresses, as usual. The Data stack holds parameters for and results of subroutine calls. This distinction between control and data minimizes the cost of subroutine calls. As a result, Forth code is typically highly factored into many tiny subroutines, called words. Referencing a word causes its code to be executed.
+
+<p>These simple words are easily and thoroughly tested by typing them on the command line. The Edit/Compile/Test sequence is extremely fast, boosting programmer productivity. A philosophy of <a href="binding.html">early binding</a> helps to produce efficient, reliable code.
+
+<p>A new word is defined by a string of previously-defined words ending with a semicolon. The only other syntax is that IF must be matched with THEN, and FOR with NEXT.
+
+<p>In Forth, a new word is defined by a preceeding colon, words inside a definition are compiled, outside are executed. In <font color="red">color</font><font color="green">Forth</font> <font color="red">a new word is red,</font> <font color="green">green words are compiled,</font> <font color="#c0c000">yellow executed.</font> This use of color further reduces the syntax, or punctuation, needed. It also makes explicit how the computer will interpret each word.
+
+<p><font color="red">color</font><font color="green">Forth</font> does not conform to the ANS Forth Standard. It is a dialect built upon the instruction set of my Forth microprocessor chips. The Pentium version implements those <a href="forth.html">instructions</a> as macros. And adds others as needed to optimize the resulting code.
+
+<h1>Rationale</h1>
+Current software is shameful. Giant operating systems linger from the 1970's. Applications are team-produced with built-in obsolescence. User interfaces feature puzzle-solving.
+
+<p>With the huge RAM of modern computers, an operating system is no longer necessary, if it ever was. <font color="red">color</font><font color="green">Forth</font> includes multi-tasking, and drivers for essential devices. But that is hardly an operating system in the style of Windows or Linux.
+
+<p>Megabytes of software may be required for historical compatibility, but sometimes we need a fresh start. <font color="red">Color</font><font color="green">Forth</font> provides the necessary capability with kilobytes of code. At boot, it copies disk into RAM. Then compiles the macros that emulate the stack machine that Forth expects. 
+As applications are requested, they are compiled.
+
+<p>A Forth application can take <a href="1percent.html">1% the code</a> employed by the same application written in C.
+
+<h1>Source</h1>
+Except for a small kernal, source is all there is. Object code is recompiled as needed, which takes no discernable time. This saves untold trouble in maintaining and linking object libraries.
+
+<p>Rather than a string of 8-bit characters, <font color="red">color</font><font color="green">Forth</font> interprets <a href="parsed.html">pre-parsed</a> words. A word starts with 4 bits that indicate its color and function - text, number, etc. Then 28 bits of left-justified, Shannon-coded <a href="chars.html">characters</a>, averaging 5.2 bits each. Numbers are stored in binary. Each word occupies 1 or more 32-bit memory locations.
+
+<p>This pre-parsed source makes instantaneous compile possible. A special text Editor is included that understands this format. The source can be <a href="compress.htm">un-parsed</a> into a bit string for compression and security.
+
+<p>Here is a sample of <a href="ide.html">source code</a>, the guts of the IDE hard-disk driver. Yes, that's all it takes. Below the line is a 'shadow block' of comments explaining the code.
+
+<p>And here is a paper describing <a href="arith.htm">arithmetic</a> for the GreenArrays' c18 computer. Lots of functions implemented with colorForth instructions.
+
+<h1>Display</h1>
+Source code is organized in 256-word blocks. This helps factor code into a managable heirarchy. The code in a block is analogous to that in a C file. But considerably more compact.
+
+<p> Blocks are numbered, some are named. They are displayed with 16x24pixel characters, arranged in a 40x24 format on a 1024x768 display. At the bottom, the contents of the Data stack, and the current word are displayed.
+
+<p>This display format is also used by applications. The large characters are readable and help minimize clutter. Double-size characters are available, as are graphic shapes (triangle, box, hexagon, circle), images (JPEG, GIF), 3D shapes and anything else that's been coded.
+
+<h1>Keyboard</h1>
+Continuing my experiments with keyboards, I currently prefer using 27 keys to provide the 48 characters needed. These are the <a href="keys.html">home keys</a> of a standard 101-key keyboard, allowing the other 74 to be ignored.
+
+<p>The assignment of the keys changes, with the current one displayed on-screen at lower right. It's pleasantly easy to type while referring to the display.  These keys minimize finger travel, as close to Dvorak's arrangement as 27 keys permit.
+
+<p>They are used as function keys (menu selects) for applications. The only text that needs to be typed is when editing source code.
+
+<p>Other arrangements are possible. Including, gulp, standard qwerty.
+
+<h1>References</h1>
+<a href="http://www.ultratechnology.com/">Jeff Fox</a> has written about Forth and <font color="red">color</font><font color="green">Forth</font>. He also has videos of talks given at Forth meetings.
+
+<p><a href="http://www.theforthsource.com/">Glen Haydon</a> publishes literature about Forth. He has copies of Leo Brodie's best-selling book <em>Starting Forth</em>.
+
+<p>The <a href="http://www.forth.org/">Forth Interest Group</a> organizes meetings and has literature and libraries of Forth code. They are on a Webring that links to other Forth sites.
+
+<p>Elizabeth Rather at <a href="http://www.forth.com/">Forth, Inc</a> provides commercial-grade Forth systems and applications.
+
+<p>Greg Bailey has information about the <a href="ftp://ftp.uu.net/vendor/minerva/uathena.htm">ANS Forth Standard</a> and its Technical Committee J14.
+
+</body>

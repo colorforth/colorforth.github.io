@@ -1,0 +1,19 @@
+<h1>Gate Edge Capacitance</h1>
+The gate has plate capacitance to substrate/well and edge capacitance to drain/source diffusion. Numerically,<pre><b>
+     Cg = 3 fF/tile
+     Cd = 3
+    Cgd = 1</b></pre>
+
+The charge on the drain is<pre><b>
+     Qd = Vd Cd + (Vd-Vg)Cgd
+     Vd(Cd+Cgd) = Qd + Vg Cgd</b></pre>
+Likewise<pre><b>
+     Vg(Cg+Cgd) = Qg + Vd Cgd</b></pre>
+
+Thus, edge capacitance is added to both gate and drain nets.  Charge is modified by the other voltage.  If the source is a power bus, its capacitance is added to the gate, but its charge is ignored.
+
+<p>Edge capacitors with the same gate and drain are combined.  This happens with the n- and p- transistors of an inverter.
+
+<p>While the gate of a transistor is rising, its drain is pulled up, offsetting the drain current.  When the gate stabilizes, the full current is realized.  This shortens the rise/fall time of a transition.  As the drain falls, it pulls the gate down.  This is called Miller effect.
+
+<p>If the output of an inverter has 30 fF, edge capacitance is 3, or 10%. As the gate swings 5 V, the drain experiences a .5 V variance due to this effect.

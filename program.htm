@@ -1,0 +1,19 @@
+<body bgcolor="#d0ffd0">
+
+Updated July 12
+<h1>Programming <font color="red">color</font><font color="green">Forth</font></h1>
+
+<h1>Getting started</h1>
+Easiest way to start an application (which I use) is to pick the closest example. Copy its main block to a new block. Rip out the garbage.
+
+<p>First put up a display, blank screen is fine. Then define the keypad, with null keys. Gradually build the display and add functional keys. Keys are displayed from their icon index packed 4/word. Icon editor provides the index.
+
+<p><font color="red">Save</font> after you've typed more than you care to lose.
+
+<p>Take advantage of the continually refreshed display. It's there to provide motion. If you look at a dump of graphic registers, some are changing. Neat!
+
+<p>If you exceed a half-dozen blocks of code, think about factoring. If the application has several phases, they can overload one-another. Compile time is imperceptable.
+
+<h1>Words</h1>
+There are some useful words buried in the kernel. I'll describe them here. Till I do, you can see them in COLOR.ASM. But they're not documented.
+</body>

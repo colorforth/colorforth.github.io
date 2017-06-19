@@ -1,0 +1,53 @@
+<h1>1% the code</h1>
+This is a provocative statement. It warrants some discussion.
+
+<h1>C programs</h1>
+I've studied many C programs in the course of writing device drivers for <font color="red">color<font color="green">Forth<font color="0">. Some manufacturers won't make documentation available, instead referring to Linux open source.
+
+<p>I must say that I'm appalled at the code I see. Because all this code suffers the same failings, I conclude it's not a sporadic problem. Apparently all these programmers have copied each others style and are content with the result: that complex applications require millions of lines of code. And that's not even counting the operating system required.
+
+<p>Sadly, that is not an undesirable result. Bloated code does not just keep programmers employed, but managers and whole companies, internationally. Compact code would be an economic disaster. Because of its savings in team size, development time, storage requirements and maintainance cost.
+
+<p>What's wrong with C programs?<ul>
+
+<li>Some problems are intrinsic to the C language:<ul>
+<li>It has elaborate sytnax. Rules that are supposed to promote correctness, but merely create opportunity for error.
+<li>It has considerable redundancy. This increases trivial errors that can be detected. And program size.
+<li>It's strongly typed, with a bewildering variety of types to keep straight. More errors.
+<li>As an infix language, it encourages nested parentheses. Sometimes to a ludicrous extent. They must be counted and balanced.
+<li>It's never clear how efficiently source will be translated into machine language. Constructs are often chosen because the programmer knows they're efficient. Subroutine calls are expensive.
+<li>Because of the elaborate compiler, object libraries must be maintained, distributed and linked. The only documentation usually addresses this (apparantly difficult) procedure.</ul>
+
+<li>Others are a matter of style:<ul>
+<li>Code is scattered in a vast heirarchy of files. You can't find a definition unless you already know where it is.
+<li>Code is indented to indicate nesting. As code is edited and processed, this cue is often lost or incorrect.
+<li>Sometimes a line of code contains only a parenthesis, or semicolon.
+ This reduces the density of the code, and the difficulty of reading it.
+<li>There's no documentation. Except for the ubiquitous comments. These interrupt the code, further reducing density, but rarely conveying useful insight.
+<li>Names tend to be hyphenated. This makes them unique and displays their position in the heirarchy. The significant portion of a name is hard to detect, slow to read.
+<li>Constants, particularly fields within a word, are named. Even if used, the name rarely provides enough information about the function. And requires continual cross-reference to the definition.
+<li>Preoccupation with contingencies. In a sense it's admirable to consider all possibilities. But the ones that never occur are never even tested. For example, the only need for software reset is to recover from software problems.
+<li>Conditional compilation. More constants include or exclude code for particular platforms. More indentation. More difficulty fathoming which code is relevant.
+<li>Hooks for future enhancements, or abandoned features, are abundant. This is useful only in understanding the programmer's ambitions.
+<li>It is in a programmer's best interest to exaggerate the complexity of his program.</ul>
+
+<li>Another difficulty is the mindset that code must be portable across platforms and compatible with earlier versions of hardware/software. This is nice, but the cost is incredible. Microsoft has based a whole industry on such compatibility.</ul>
+
+<h1>Forth</h1>
+<font color="red">color<font color="green">Forth<font color="0"> does it differently. There is no syntax, no redundancy, no typing. There are no errors that can be detected. Forth uses postfix, there are no parentheses. No indentation. Comments are deferred to the documentation. No hooks, no compatibility. Words are never hyphenated. There's no heirarchy. No files. No operating system.
+
+<p>Code is organized so that a block of related words fit on the screen. Names are short with a full semantic load. The definition of a word is typically 1 line. Machine code has a one-to-one correspondance with source.
+
+<p>An application is organized into multiple user interactions, with unique display and keypad. Each is compiled when accessed. Its code is independent, names need not be unique. A background task is always running.
+
+<h1>Comparison</h1>
+Yes, I could write a better C program that those I've seen. It wouldn't be nearly as good as Forth. I can't write an assembler program as good as Forth. No, I don't think Forth is the best possible language. Yet.
+
+<p>But does this add up to 1% the code? Where is the C program I've recoded? No one has paid me to do that. One difficulty is comparing my Forth with the original C. I cheat. The 1% code merely starts an argument that they're not the same.
+
+<p>For example, my VLSI tools take a chip from conception through testing. Perhaps 500 lines of source code. Cadence, Mentor Graphics do the same, more or less. With how much source/object code? They use schematic capture, I don't. I compute transistor temperature, they don't.
+
+<p>But I'm game. Give me a problem with 1,000,000 lines of C. But don't expect me to read the C, I couldn't. And don't think I'll have to write 10,000 lines of Forth. Just give me the specs of the problem, and documentation of the interface.
+
+<h1>My Conclusion</h1>
+<p><font color="red">color<font color="green">Forth's<font color="0"> incredibly small applications provide new estimates of their overstated complexity.

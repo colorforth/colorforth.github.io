@@ -1,0 +1,49 @@
+<title>Pre-parsed Word Format</title>
+<meta name="description" content="By" pre-parsing source code, colorforth provides instant compilation. text is huffman-coded, numbers are binary. a function code identifies each word.>
+<meta name="keywords" content="Forth," color, parse, words, huffman, pack, dictionary, compile>
+</head><body bgcolor="#d0ffd0">
+
+<h1>Pre-parsed words</h1>
+Text is stored as 32-bit words, with possible extension words<table border>
+<tr><td>bits<td>31..........................4<td>3..0<td>function<td>color
+<tr><td><td>characters<td>0<td>extension
+<tr><td><td><td>1<td>execute<td>yellow
+<tr><td><td><td>3<td>define<td>red
+<tr><td><td><td>4<td>compile<td>green
+<tr><td><td><td>7<td>compile<td>cyan
+<tr><td><td><td>9<td>comment<td>white
+<tr><td><td><td>a<td>Capitalized<td>white
+<tr><td><td><td>b<td>all caps<td>white
+<tr><td><td><td>c<td>variable<td>magenta
+</table>
+
+<p>Numbers have a bit for display format (decimal/hex). Those that fit in 27 bits (with sign extend) are stored<table border>
+<tr><td>bits<td>31.........................5<td>4<td>3..0<td>function<td>color
+<tr><td><td>number<td>hex<td>8<td>execute<td>yellow
+<tr><td><td><td><td>6<td>compile<td>green
+</table>
+
+<p>Larger numbers require 2 32-bit words<table border>
+<tr><td>bits<td>31.........................5<td>4<td>3..0<td>function<td>color
+<tr><td><td><td>hex<td>2<td>execute<td>yellow
+<tr><td><td><td><td>5<td>compile<td>green
+</table><table border>
+<tr><td>bits<td>31..............................0
+<tr><td><td>number</table>
+
+<h1>Functions</h1>
+A <font color="red">red word<font color="0"> is defined: its name (1st word only) is placed in the next entry of a table of names. The current location in the dictionary is placed in a parallel table of locations. The name table will be searched backwards (from most recent to earliest). If a word is not found, a ? is displayed and the Editor points at the word in the source code.
+
+<p>A <font color="#c0c000">yellow word <font color="0"> is executed. Which means that the code it points to is called. Upon return, the Data stack may be different. A <font color="#c0c000">yellow number<font color="0"> is pushed onto the Data stack.
+
+<p>The word 'forth' selects the main dictionary. The word 'macro' selects another dictionary. <font color="red">Red words<font color="0"> will now be defined here. A <font color="green">green word<font color="0"> causes this to be searched. If found here, it is executed and presumably compiles some code. Otherwise the forth dictionary is searched and a call to the word's location is compiled. A green number compiles code that pushes it onto the Data stack.
+
+<p>If a macro is <font color="cyan">cyan<font color="0"> it is compiled, not executed. This allows nesting macros. An ordinary word could be <font color="cyan">cyan<font color="0">, but this is unnecessary and confusing. Should a macro be <font color="#c0c000">yellow<font color="0">, it will not be found.
+
+<p><font color="#c0c000">Yellow words<font color="0"> within a definition will be executed, as expected. However, they should leave a (single) number on the stack. The transition from <font color="#c0c000">yellow to <font color="green">green words<font color="0"> causes this number to be compiled. Thus numbers can be calculated inside definitions, which helps understand where they came from.
+
+<p>A <font color="magenta">magenta word<font color="0"> defines a variable. Its code is shared with other variables. The next word in the dictionary is used to point back to the source code, where the value of the variable is stored (initially 0). A <font color="#c0c000">yellow variable<font color="0"> pushes its address onto the Data stack.
+
+<p>The value of a variable is not disturbed by recompilation. It is saved with the source code and restored with the next boot. Its value is displayed by the Editor. These variables have the flavor of 'state variables'. Temporary variables are usually held on the stack.
+
+<p>On the Pentium, <font color="#c0c000">yellow variables<font color="0"> are preferred. At compile time, their address is returned and will be compiled as a literal at the yellow-green transition. (Remember, only 1 number is compiled per yellow-green transition.) A <font color="green">green variable<font color="0"> compiles a call to code executed at run time to put the address on the stack.

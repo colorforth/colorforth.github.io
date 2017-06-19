@@ -1,0 +1,28 @@
+<title>colorForth VLSI Design Tools</title>
+<meta name="description" content="A Forth description of gates, interconnect and chip translates into a GDSII file. It also produces a layout which can be displayed and from which nets and transistors are extracted and simulated.">
+<meta name="keywords" content="Forth, VLSI, design tools, gates, GDS, GDS II, layout, nets, transistors, extract, simulate, IV curves, body effect, transistor temperature">
+</head><body bgcolor="#d0ffd0">
+
+Updated 2009 May 25
+<br><a href="index.html">colorForth Home Page</a>
+<h1>VLSI Design Tools</h1>
+In 500 lines of <font color="red">color</font><font color="green">Forth</font> these tools provide everything required to design a chip. They are derived from an earlier version called OKAD that successfully generated many versions of <a href="chips.html">Forth microprocessor chips</a>.
+
+<h1>Description</h1>
+A chip requires the placement and interconnect routing for a heirarchy of gates, cells, pads and floorplan. This is described using a coarse-grid coordinate system of boxes called "tiles". Each tile has 6 layers and can describe a trace, contact or transistor. Tile size is chosen to enforce the geometric design rules for a particular process.
+
+<p>A language for describing this is carefully designed to translate easily into GDSII. It includes positioning wells and diffusion, placing polysilicon to form a transistor, adding contacts to source and drain and routing traces amongst layers. This is a geometric description of a chip, including more information than a <a href="schematic.html">schematic</a> provides.
+
+<h1><a href="gates.htm"> Gates </a></h1>
+The gate library is where it starts. Several tiles are combined to construct a gate. Multiple gates form modules and multiple modules the chip. Basic gates are listed, with example descriptions and layout.
+
+<h1><a href="layout.html"> Layout </a></h1>
+The description is compiled and executed to construct a flat layout of a module, or the entire chip. This requires megabytes of RAM. The layout may be displayed in 2 or 3 dimensions at any magnification. It is examined for a design-rule-check. From it are extracted a list of transistors and a list of interconnect nets.
+
+<h1><a href="simulation.html"> Simulation </a></h1>
+A transistor's current depends on the voltage of input, output and gate nets. And also upon channel width and temperature. The Simulator uses the transistor and net lists. Power is applied to the appropriate nets and the current through each transistor is computed. This changes the charge on the drain net and the temperature of the transistor. Voltage is computed from the net charge and capacitance. This repeats with a time step of 1 ps.
+
+<h1><a href="rendition.html"> GDSII </a></h1>
+Compiling the description in a special context generates a standard GDS file instead of the layout. It takes no time and is accurate because of the one-to-one correspondance between Forth and GDS code.
+
+</body>

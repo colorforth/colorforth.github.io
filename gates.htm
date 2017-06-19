@@ -1,0 +1,38 @@
+<h1 align="center">Gates</h1><h3>
+High time I fixed this link. Somehow I lost the original page, but it probably looked much like this. There are many more gates to describe. So, a work in progress.
+
+<p>A gate is a module used to construct circuits. It has a few transistors connected to perform some logic function.
+
+<p>A transistor is a 3-terminal device. It has a source (power), drain (output) and gate (input). Yep, the same word, different meaning. The gate is red (polysilicon), source and drain are green (diffusion). Metal connections are blue (silver for metal-2).
+
+<h1>Simple Gates</h1>
+
+<h2>Inverter
+<img src="inv.bmp"></h2>
+This is the simplest and most used gate. It has 2 transistors, one connected to power (Vdd) (on the right) and one to ground (Vss). They share a common gate and drain. If the gate is high, the n-transistor connects Vss to the drain. When it goes low, the p-transistor connects Vdd to the drain. Thus a high input produces a low output; and vice-versa.
+
+<p>The p-transistor passes half the current as the n- . It is twice as wide so the current is the same. The gate is symmetric when the rise and fall times are equal.
+
+<h2>Nand
+<img src="nand.bmp"></h2>
+This nand gate has 4 transistors, with 2 gates. If both inputs are high, the drain is low. Thus it implements the not-and function, an and followed by a not (invert). If it were andn (and not) it would be consistent with Forth's postfix notation.
+
+<p>The n-transistors are double-wide since 2 transistors in series pass half as much current. An on transistor acts like a 4K resistor.
+
+<h2>Nor
+<img src="nor.bmp"></h2>
+This nor gate goes high if both inputs are low. Not-or.
+
+<p>The white squares mark power contacts: a connection to a metal-2 power bus running vertically. The yellow square marks a substrate contact: Vss must periodically be connected to the  substrate; and Vdd to the n-well.
+
+<h2>Xor
+<img src="xor.bmp"></h2>
+The xor (exclusive or) gate has 8 transistors. There are 4 inputs, 2 signals and their inverse. They're connected so that if 2 inputs are the same the drain goes low, otherwise stays high. (The inner inputs are crossed. There's an obscured red stairstep.)
+
+<p>There's a very clever xor gate that uses only 6 transistors. But it's not symmetric, one input is stronger than the other. So I don't use it.
+
+<h2>Pass</h2>
+
+<h1>Complex gates</h1>
+
+<h2>Latch</h2>

@@ -1,0 +1,76 @@
+<body bgcolor="#d0ffd0">
+Updated 2001 July 12
+
+<h1>Pentium <font color="red">color</font><font color="green">Forth</font></h1>
+Boots into 32-bit mode with a flat address space. Segment registers are based at zero; essentially unused. Interrupts off. Protections off.
+
+<p>Data are addressed as 32-bit words, not bytes. But ESP and ESI hold byte addresses, for optimization. Instructions are optimized if agruments are literals.
+
+<p>Registers are assigned:<ul type="none">
+<li>0 EAX: stack (1st number on Data stack)
+<li>1 ECX: string counter, scratch
+<li>2 EDX: address register A, I/O port, scratch
+<li>3 EBX: unused
+<li>4 ESP: byte pointer to top of Return stack
+<li>5 EBP: unused
+<li>6 ESI: byte pointer to 2nd number on Data stack
+<li>7 EDI: dword pointer to next word to be interpreted</ul>
+
+<p>27 chip primitives
+<table border>
+<tr><td>Op<td>Word<td>Pentium<td>Action
+<tr><td>0<td>word ;<td>jmp<td>Jump to word; tail recursion
+<tr><td>1<td>if<td>jz<td>Jump to 'then' if zero
+<tr><td>2<td>word<td>call<td>Call word
+<tr><td>3<td>-if<td>jns<td>Jump to 'then' if not negative
+<tr><td>6<td>;<td>ret<td>Return to calling word
+
+<tr><td>8<td>@<td>mov EAX, [EAX*4]<td>Fetch from address on stack
+<tr><td><td><td>dup; mov EAX, a
+<tr><td>9<td>@+<td>dup; mov EAX, [EDX*4]<br>inc EDX<td>Fetch from address in A; increment A
+<tr><td>a<td>n<td>dup; mov EAX, n<td>Fetch number
+<tr><td>b<td>@r<td><td>Fetch from address in R
+<tr><td>c<td>!<td>a!; mov [EDX*4], EAX; drop<td>Store to address on stack
+<tr><td><td><td>mov a*4, EAX; drop
+<tr><td><td><td>mov a*4, n
+<tr><td>d
+<tr><td>e<td>!+<td>mov [EDX*4], EAX; inc EDX<td>Store to address in A; increment A
+<tr><td>f<td>!r<td><td>Store to address in R; increment R
+
+<tr><td>10<td>2*<td>shl EAX, 1<td>Shift stack left
+<tr><td>11<td>2/<td>sar EAX, 1<td>Shift stack right, propagate sign
+<tr><td>12<td>-<td>not EAX<td>Ones complement stack
+<tr><td>14<td>and<td>and EAX, [ESI]; nip<td>And to stack
+<tr><td><td><td>and EAX, n
+<tr><td>15<td>or<td>xor EAX, [ESI]; nip<td>Exclusive-or to stack
+<tr><td><td><td>xor EAX, n
+<tr><td>16<td>+<td>add EAX, [ESI]; nip<td>Add to stack
+<tr><td><td><td>add EAX, n
+<tr><td>17<td>*+<td><td>Multiply step
+<tr><td>18<td>push<td>push EAX; drop<td>Push stack onto Return
+<tr><td>19<td>a<td><td>Load A register onto stack
+<tr><td>1a<td>dup<td>lea ESI, ESI-4; mov [ESI], EAX<td>Duplicate stack
+<tr><td>1b<td>over<td>dup; mov EAX, [ESI+4]<td>Load 2nd datum onto stack
+<tr><td>1c<td>pop<td>dup; pop EAX<td>Pop Return onto stack
+<tr><td>1d<td>a!<td>mov EDX, EAX; drop<td>Store stack into A register
+<tr><td>1e<td>drop<td>lodsd<td>Discard stack
+<tr><td>1f<td>nop<td>nop<td>Do nothing</table>
+
+<p>Other Pentium macros:
+<table border>
+<tr><td>Word<td>Pentium<td>Action
+<tr><td>nip<td>lea ESI, ESI+4<td>Discard 2nd stack item; preserve flags
+<tr><td>swap<td>mov EDX, EAX; <br>mov EAX, [ESI]; mov [ESI], EDX<td>Exchange stack with 2nd number
+<tr><td>+!<td>a!; add [EDX], EAX; drop<td>Add to address on stack
+<tr><td><td>add a*4, EAX; drop
+<tr><td><td>add a*4, n
+<tr><td>*<td>imul EAX, [ESI]; nip<td>Multiply with stack
+<tr><td><td>imul EAX, n
+<tr><td>*/<td>mov ECX, EAX; drop<br>imul [ESI]; idiv [ECX]; nip<td>Multiply 2 numbers, divide by stack</table>
+
+<p><ul>
+<li>The word - is the unary ones-complement, not the binary subtract. Its result is 1 less than negate, and much faster in hardware.
+<li>The word or is exclusive-or. Inclusive-or is rarely needed.
+<li>The word */ multiplies by a ratio, with a double-length intermediate product. It eliminates the need for floating-point.<ul>
+
+</body>

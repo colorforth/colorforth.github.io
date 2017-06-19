@@ -1,0 +1,86 @@
+<img src="sao.jpg" align="right">
+
+<h1 align="center">Ephemeris 4
+<br>Chuck Moore
+<br>April 2012</h1>
+The following is a re-keying of a report I wrote in 1958. It follows the cover page of a volume of Reports. It's been reformatted to suit HTML, but retains the original page numbers (30, 31 and 32) and the excessive number of commas. Headings have been added.
+
+<p>I was hired in fall of 1957 to compute these predictions on a 
+Friden Electo-Mechanical Calulator, which was fun. I was a somewhat bored Sophomore at MIT, fascinated by the launch of Sputnik.
+
+<p>John Gaustad, who also has a report in this volume, suggested I program the MIT computer to do my job. He loaned me a Fortran II manual and I did. Smithsonian was near Harvard which is a neighbor of MIT so that could be arranged. I became an after-hours resident of MIT's new computer center.
+
+<p>Don Lautman, my co-author, was writing his own program to numerically integrate satellite orbits. It was slow and behind schedule, hence my opportunity to use orbital elements and get quick results. 
+
+<p>This was one of the first times I changed the stated problem in order to get the desired solution. It worked so well that I received this commendation as well as a copy of the Reports autographed by Fred Whipple, a mythic figure. Which doubtless helped set me on my problematic course.
+
+<hr>
+<h2 align="center">SMITHSONIAN INSTITUTION
+<br>ASTROPHYSICAL OBSERVATORY
+<br>Special Report No. 11
+<br>IGY Project No. 30.10
+<br>NSF Grant No. Y/30.10/167
+
+<p>STATUS REPORTS ON OPTICAL OBSERVATIONS
+<br>OF SATELLITES 1958 ALPHA AND 1958 BETA
+
+<p>Project Director: Fred L. Whipple
+<br>Associate Director: J. Allen Hynek
+<br>Edited by: G.F. Schilling</h2>
+
+<h2 align="center">March 31, 1958
+<br>Cambridge, Massachusetts</h2>
+
+<hr><h3 align="center">- 30 -
+<p>Predictions for Photographic Satellite
+<br>Tracking Stations -- APO Ephemeris 4
+<p>by
+<p>Charles H. Moore* and Don A. Lautman**</h3>
+
+<h3>Abstract</h3>
+Ephemeris 4 is the computer program for predicting satellite positions for the Baker-Nunn camera stations. The present formulation utilizes the currently best set of elements available, accounting for the drag by means of a polynomial in the mean motion, and including only secular perturbations. The predictions subroutine is a numerical integration which includes the effects of oblateness and drag exactly. In the case of satellites which are high enough so that drag can be neglected, a complete first-order perturbation theory including periodic perturbations can be used.
+
+<h3>Program</h3>
+The basic requirements demanded of predictions intended for camera stations are:<ol>
+<li>Predictions must be limited to observable passes and
+<li>predictions must be made for the point of culmination.</ol>
+The optimum approach would be to integrate the equation of motion for the satellite, obtaining these predictions, as well as other data, directly. However, a quicker, though less accurate, method is discussed here, which has been developed in an attempt to obtain predictions as soon as possible.
+
+<p>This program for the IBM EDPM 704 employs the orbital elements of the satellite and transforms them by graphical (trigonometric) means into specific predictions. The accuracy of the predictions is well within the accuracy of the orbital elements employed, and is probably the best that can be gotten without employing more sophisticated methods, and is fitted to the requirements of the Baker-Nunn tracking cameras.
+
+<h3>Usage</h3>
+The input to the computer consists basically of the coordinates of the stations (latitude, longitude and height above sea level) and the orbital elements. The latter include the time at which the satellite is at the ascending
+
+<p>* Physical Science Aide, Optical Satellite Tracking Program, Smithsonian Astrophysical Observatory
+
+<p>** Mathematician, Optical Satellite Tracking Program, Smithsonian Astrophysical Observatory
+
+<hr><h3 align="center">- 31 -</h3>
+node (or at perigee), the right ascension of the ascending node, the argument of perigee, the inclination of the orbit to the equatorial plane, the value of perigee, and the eccentricity of the orbit. Time is given as a polynomial in the number of revolutions, from which the period can be determined; position of the ascending node and perigee are polynomials in time; the other elements are instantaneous values at an arbitrary, specified time. Additional input data includes positions of the vernal equinox and the sun for January 0 of the current year, and the dates for which predictions are desired.
+
+<p>The program follows the general outline listed below:<ol>
+<li>Reduces the station coordinates to more convenient form.
+<li>Updates the instantaneous values of the orbital elements. This is done each revolution.
+<li>Computes the point of entry into and exit from the earth's shadow. This data may be printed out if desired. It is useful for general predictions where great accuracy is not expected.
+<li>Computes the position of culmination for each station, determines whether the conditions for visibility from the stations are fulfilled, and if so prints that information.</ol>
+
+<h3>Output</h3>
+There are three distinct portions of the output. First, the latitude, longitude and time of entry into or exit from the earth's shadow. Second, the altitude, azimuth, range, for each station. The conditions for visibility employed require that the satellite be visible at least 15<sup>o</sup> above the horizon and be illuminated by the sun, while the station is inside the earth's shadow. No restriction is placed upon the photographic magnitude of the satellite. Hence, the range is printed to be taken into consideration when using the predictions. Angular velocity is useful for tracking purposes.
+
+<p>The third portion of the output is essentially the station prediction described above, however, it is put into a code suitable for teletype transmission, which may be sent directly without further reworking.
+
+<p>Thus, the program computes predictions over a specified interval of time and supplies the following information at each visible passage of a station:
+
+<hr><h3 align="center">- 32 -</h3>
+
+<ol>
+<li>Altitude and azimuth of the point of closest approach.
+<li>Time of closest approach.
+<li>Apparent angular velocity.
+<li>Angle between point of closest approach and passage into or out of the earth's shadow.
+<li>Time of intersection with the earth's shadow.
+<li>Distance of the satellite.
+<li>Zenith angle of the sun.</ol>
+
+<h3>Conclusion</h3>
+The advantages of the program are an expected minimum of computation time, and the elimination of superfluous data, namely non-observable predictions. With such a program, predictions can be made to the necessary accuracy as soon as orbital elements are available. The disadvantage of the program is its dependence upon the independently determined orbital elements.

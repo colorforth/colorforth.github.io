@@ -1,0 +1,20 @@
+<h1 align="center">colorForth Source Compression</h1><h3>
+ColorForth source is quite distinct from familiar ASCII. ASCII text is a string of 8-bit characters. ColorForth uses variable length characters organized into words, with each word including a 4-bit tag.
+
+<p>Text is further organized as 1024-byte blocks. Each block stores a related set of Forth words and serves a function much like a paragraph.
+
+<p>On a Pentium, text is factored into 32-bit words. Each has 28 bits of characters and a 4-bit tag in the low-order bits. A tag of 0 indicates additional characters for the previous word. <a href="chars.html">Characters</a> occupy 4, 5 or 7 bits, depending on their frequency of use. These <a href="parsed.html">pre-parsed words</a> speed compilation, the only cost being dictionary search.
+
+<p>On a GreenArrays chip, the factoring would be into 2 18-bit words, with a 4-bit tag.
+
+<p>I originally called the variable-length characters Huffman-coded. I was advised to call them Shannon-coded. These codings have algorithms to determine an optimum frequency distribution based on a sample of text. I don't do that, so neither term is accurate. I simply use the frequency of English letters, adjusted to suit.
+
+<p>The application I use colorForth for is called OKAD, Ok Aided Design. It is set of design tools for VLSI layout/simulation. The Ok comes from classic Forth, where each command line is acknowledged with it. The source code for OKAD occupies 1440 blocks, the amount that can be stored on a floppy disk. This is the largest body of code I've ever written and has taken some 8 years to develop.
+
+<p>This text can be compressed significantly by converting from 32-bit words to a bit string. That is, 4-bit tags and variable length characters strung together as a continuous string of bits. Words are 0-delimited with 4-bits of zeros. As are blocks. This not only compresses the source, but facilitates the transition from 32-bit words to 36-bit. The original 1440 blocks become 300 blocks; that is, 300KB. Reading and writing floppy becomes 4x faster.
+
+<p>In this format, each word begins with the tag, so that it can be properly interpreted. For example, words are 0-terminated; numbers are 32-bits; variables are both. It takes 2 blocks of colorForth code to compress the text; another 2 blocks to decompress. More than I expected, but easily affordable.
+
+<p>Incidently, the resulting bit string is not only compressed, but encrypted. A casual viewer can make no sense of it. Without this description and appropriate software it is not comprehensible. Looking at a dump of the bit string is extremely confusing. I'll prepare some examples of decompressed and compressed code soon.
+
+<p>One optimization remains: all numbers are 32-bits. A 5-bit count and variable-length number would improve compression. I'll get around to it sometime.

@@ -1,0 +1,57 @@
+<h1 align="center"><font color="red">color<font color="green">Forth</font></font> Primer
+<br>Chuck Moore</h1><h3>
+
+<font color="red">color<font color="green">Forth</font></font> is a uniquely simple way of programming computers. It is particularly suited to the multi-computer chips of <font color="green">GreenArrays</font>. How simple it is:
+
+<h2>Words</h2>
+<font color="red">color<font color="green">Forth</font></font> uses words much as English does. (A <em>word</em> can be a subroutine, if that helps.) A <em>word</em> is a string of lower-case characters (from a set of 48) ending with space. The character @ is pronounced <em>fetch</em> and fetches a number from some address. Likewise, ! (<em>store</em>) stores a number. Some words:<ul><font color="green">
+   <li>and or drop dup over push pop
+   <li>for next unext -if if then
+   <li>; @ ! @+ !+ @b !b @p !p
+   <li>+ . +* 2* 2/ - b! a!
+   <li>12345 -1 144 0</font></ul>   
+
+<p>If you type a <font color="#a0a000">word</font>, the computer will perform some action. For example<ul>
+   <li><font color="#a0a000">on</font></ul>
+might turn on a light.
+
+<h2>Numbers</h2>
+Words that look like numbers are placed on a push-down stack (like a stack of dishes). @ also puts numbers on the stack. There they serve as arguments for later words:<ul>
+   <font color="green"><li>1000 ms
+   <li>3 !</font></ul>
+
+
+<h2>Definitions</h2>
+New words are defined in terms of old:<ul>
+   <li><font color="red">toggle <font color="green">on 1000 ms off ;</font></font></ul>
+The red word is defined by the following green words. When you type <font color="#a0a000">toggle</font>, the light is turned on, the computer waits 1000 ms (milliseconds) then turns it off. Semicolon marks the end of this word (return from subroutine).
+
+<p>Other words:<ul>
+   <li><font color="red">on <font color="green">3 ! ;</font></font>
+   <li><font color="red">off <font color="green">2 ! ;</font></font></ul>
+Here a number is stored into a register to change an output.
+
+<h2>Loops</h2>
+Computers are good at repetition. Here's one way to define a loop:<ul>
+   <li><font color="red">ms <font color="green">for 1ms next ;</font></font></ul>
+The word <font color="green">for</font> expects an argument and puts it into a counter. The word <font color="green">next</font> returns to <font color="green">for</font> that many times. The word <font color="green">1ms</font> waits 1 millisecond.
+
+<h2>Conditions</h2>
+Computers sometimes need to make decisions:<ul>
+   <li><font color="red">abs <font color="green">-if - 1 + then ;</font></font></ul>
+<font color="green">abs </font>will return the absolute value of its argument. If it is negative, <font color="green">-if</font> does a ones-complement and adds 1. If it is not negative (positive or 0) <font color="green">-if</font> jumps to <font color="green"> then</font> and does nothing.
+
+<h2>Compiler</h2>
+<font color="red">color<font color="green">Forth</font></font> compiles source code into machine instructions, which can then be executed. It uses color to indicate the function of a word:<ul>
+   <li><font color="#a0a000">Yellow</font> - a word to be executed
+   <li><font color="red">Red</font> - a word being defined
+   <li><font color="green">Green</font> - a word to be compiled as part of a definition
+   <li>White (or black) - a comment to be ignored</ul>
+Color aids understanding, avoids syntax and simplifies the compiler.
+
+<p>The compiler reads words from text stored in memory. A special editor manages this text. <font color="red">color<font color="green">Forth</font></font> code is exceptionally compact.
+
+<h2>Program</h2>
+A program in <font color="red">color<font color="green">Forth</font></font> is a collection of simple words that describe a task. Although definitions can be long and complicated, that is not wise. A larger number of simpler words is easier to read, write, debug and document.
+
+<p>The computer begs fallible programmers: Keep It Simple, Stupid (KISS). <font color="red">color<font color="green">Forth</font></font> helps.

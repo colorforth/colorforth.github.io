@@ -1,0 +1,44 @@
+<body bgcolor="#d0ffd0">
+
+Updated 2001 July 20
+<h1>Philosophy</h1>
+I used to love to solve puzzles: crossword, jigsaw, chess. Programming now gives me the endorphin lift of achievement. Call me a programming junkie.
+
+<p>I believe in objective right and wrong. It applies to computer code. There is a single right way to balance all the conflicting demands. There is a solution to the puzzle. The challenge is to find it.
+
+<p><font color="red">color</font><font color="green">Forth</font> is my latest attempt to define a computer environment. Satisfactory for me, the programmer, and me, the user. I've published it because I'm pleased with it. Here are some of the trade-offs:<ul>
+<li>It elminates object code, except for a small kernel. No need to manage object libraries, link modules, relocate code or allocate memory. Of course, I haven't done that for a long time.
+<li>It encourages small source modules, compiled on demand. Compiling these takes no perceptible time. Perhaps it's faster than needed. Perhaps it could be faster. In any case, it's satisfactory.
+<li>It encourages 2nd-order factoring into groups of related words, via 256-word blocks of code. Hopefully, a block can be reused in a different context. But principally, it organizes and clarifies the code.
+<li>The source code is pre-parsed into word-size chunks. This simplifies the interpreter and speeds search.
+<li>Each word has a tag that specifies its function and appearance. These properties need not be inferred from context. Thus simplifying the interpreter, reducing syntax and clarifying intention.
+<li>Huffman-coded characters reduce the cost of pre-parsed words. Code size is slightly smaller than a character string, even with added tags. I learned the value and limitations of this elegant loss-less compression.
+<li>A complex Editor is the price paid for a simple interpreter. In fact, total system complexity has probably increased. But time spent by the Editor is miniscule, compared with time spent by the interpreter.
+<li>Compiler macros provide a simple, efficient way of exploiting the hardware of a platform. They factor and document machine code, yet allow its use in a natural way. They make porting efficient software possible.</ul>
+The result, to my eye, is a nicely balanced system. It's not yet perfect and will continue to evolve. I deliberately sought to make <font color="red">color</font><font color="green">Forth</font> different. I'm interested in unanticipated consequences. What happens when you change the balance of code size and compile time? What can a simple system do that a complex one cannot? What performance is sufficient to challenge the established paradigm?
+
+<p>The Pentium platform is a bridge to my Forth chips. The code will be easy to port, or to cross-compile. I hate the Pentium, the PCI bus, the bizarre device interfaces. Yet this platform has driven hardware prices down and capability up. Focusing on software for USB and TCP/IP will render legacy hardware irrelevant.
+
+<p>The strange keyboard employed by <font color="red">color</font><font color="green">Forth</font> is an approximation of the one I want:<ul>
+<li>A 3-position switch for each finger
+<li>15 buttons with 1 hand. One hand free
+<li>27 buttons with 2 hands
+<li>Buttons labeled on the screen
+<li>Buttons reassignable
+<li>Remote keypad(s) for my recliner
+<li>Suitable for a wearable computer</ul>
+One day I'll make one from bits of brass. Till then, qwerty will have to do.
+
+<h1>Legal</h1>
+After considering your comments and doing some diligence, I've decided to place <font color="red">color</font><font color="green">Forth</font> in the Public Domain. Without explicitly doing that, it would have a default copyright.
+
+<p>Public Domain allows anyone to use it for any purpose. Exactly my intention. The various licenses attach restrictions that are complicated and unenforcable.
+
+<p>My motive is simple. <font color="red">color</font><font color="green">Forth</font> offers a solution to the growing software crisis. I hope to encourage an alternative to bloatware. Besides, I'm not inclined to develop, market and distribute a product. If anyone is, more power to you.
+
+<p>I've been here before: Forth entered the Public Domain around 1972. The issue wasn't copyright, but patent protection. No software patent had yet been issued and the effort required seemed great, so NRAO (the National Radio Astronomy Observatory) declined to pursue one. I don't recall a public statement placing Forth in the Public Domain, merely a presumption.
+
+<h1>Authentication</h1>
+<font color="red">color</font><font color="green">Forth</font> could be compressed for distribution. But maybe it shouldn't.
+
+<p>It should be signed so you know you got the real thing. In time.

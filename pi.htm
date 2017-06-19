@@ -1,0 +1,27 @@
+<h1 align="center">Thoughts about Pi</h1><h3>
+Pi is a geometric constant whose value is 3.1415... It's been calculated to a trillion decimal places, but I won't use them all. You can hear some of them at <a href="http://pi.ytmnd.com/"> pi.ytmnd.com</a>.
+
+<p>Forth uses rational arithmetic with its */ operator - as opposed to floating-point. A convenient approximation to pi is 355/113, which is 3.141592... The numerator and denominator are small enough for a 16-bit computer. You can define multiplying by this ratio as<ul>
+<li>: pi   355 113 */ ;</ul>
+
+<p>Conceptually, think of pi as 3, a simple approximation good to 5%. And here I'll use d to represent diameter - of a circle or a circumscribed square.
+
+<p>Here are some useful geometric comparisons, new to me:<ul>
+<li>Circumference of a circle - d pi
+<br>In Forth that would be d 355 113 */ or d pi
+<br>Notice that 4d is the circumference of a square. The circumference of a circle is roughly 3/4 of that.
+
+<li>Area of a circle - d<sup>2</sup>pi/4
+<br>That's 3/4 the area of a square.
+
+<li>Area of a sphere - d<sup>2</sup>pi
+<br>That's 4 times the area of the circle.
+<br>And 1/2 the area of a cube.
+
+<li>Volume of a sphere - d<sup>3</sup>pi/6
+<br>That's 1/2 the volume of a cube.
+
+<li>I speculate that the surface of a 4-dimensional hypersphere is d<sup>3</sup>pi</ul>
+
+They can be summarized as: circle is 3/4 square, sphere is 1/2 cube. 
+Notice that comparing circles with squares is nicely done in terms of diameter. Radius is only useful for drawing; diameter is what you observe. For instance, the moon's diameter is 30 minutes of arc or 2 minutes of time; its radius is not interesting.

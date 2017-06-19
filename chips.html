@@ -1,0 +1,31 @@
+<title>Forth Chips</title>
+</head><body bgcolor="#d0ffd0">
+
+Updated 2001 June
+<h1>Novix, Inc</h1>
+The NC4000 was implemented as a CMOS 4000-gate array from Mostek. Bob Murphy taught me how to realize the Forth architecture. The 16-bit chip had 3 SRAM address spaces:<ul>
+<li>16-bit memory address
+<li>8-bit data stack address
+<li>8-bit return stack address</ul>
+Instructions were 16-bits with fields to control the ALU, shifter and stacks. It ran at 6 Mips, fast for the time.
+
+The NC6000 followed, with enhancements by John Rible. It became the Harris RTX2000 with 256-deep on-chip stacks. Now listed as obsolescent.
+
+<h1>Sh-Boom</h1>
+Russell Fish suggested a 32-bit chip with 8-bit instructions. I used Valid design tools for a standard-cell implementation. On-chip stacks. OKI Semiconductor made prototypes which ran at 20 Mips, fast enough to generate video.
+
+<p>It is now owned and was recently marketed by Patriot Scientific. I couldn't find a useful reference on their website.
+
+<h1>Offete Enterprises</h1>
+C.H.Ting commissioned the Mup20, the first 21-bit chip, for Orbit Technology's 1.2um process. It had 5-bit instructions and 4-deep stacks. A video co-processor generated NTSC output. This was a full-custom design, using my OKAD design tools. It went through several versions, eventually running at 100 peak Mips. Some 20,000 were manufactured.
+
+<h1>UltraTechnology</h1>
+Jeff Fox commissioned the <a href="http://www.ultratechnology.com/f21.html">F21, a network-oriented chip.</a> It added a parallel port and co-processors for network interface, D/A and A/D. Prototyped through MOSIS with the HP .8um process. The latest version runs at 500 peak Mips.
+
+<h1>iTv Corporation</h1>
+As a founder of iTvc, I developed an internet chip. It had video, serial and keyboard co-processors. This was a redesign with a more aggressive architecture. It had problems packing 4 instructions per word, finally traced to transistor temperature changes.
+
+<p>Since iTvc started at NASA Ames business incubator, they have an <a href="http://www.sti.nasa.gov/tto/spinoff1998/ct12.htm">article on the i21</a>.
+
+<h1>X18</h1>
+Recently, I realized the potential of .18um technology and designed an 18-bit computer to match available fast SRAM. It is even more aggressive, using dynamic latches, and has on-chip ROM and DRAM to sustain 2400 Mips. Its small size and on-chip memory leads to the 25x with multiple computers on the same die.

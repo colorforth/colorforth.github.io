@@ -1,0 +1,13 @@
+<h1> SPICE </h1>
+The simulator used in various versions by the semiconductor industry. Originally used for electronic circuits, it is far more elaborate than needed for digital VLSI.
+
+<p>Spice solves a large set of equations to determine DC conditions. It uses an interative technique to superimpose AC variations. Convergence is a problem in many situations.
+
+<p>CMOS digital circuits don't need such generalized tools. Voltages swing from power to ground. Even if rise/fall time is inaccurate, circuit behavior is not. Errors are not cumulative, since voltages are recalibrated when they reach a limit.
+
+<p>The MOSFET model used is derived from solid-state physics. It is complex beyond comprehension (mine at least). Even the latest pragmatic model. This is not necessary. A simple empirical model of the IV curves is adequate for digital transistors.
+
+<p>Transistor temperature is not accounted for.
+This causes a huge error, swamping the accuracy of the elaborate model. Measured IV curves necessarily refer to a hot transistor. Its temperature may be 100 K above ambient, depending on the power dissipated. Current must be increased for cold transistors, perhaps 50%. Digital transistors are normally cold, since they heat only when switching.
+
+<p>SPICE works because it is usually limited to small circuits. Designs are extremely conservative. Ground truth is very hard to obtain.

@@ -1,0 +1,53 @@
+<h1 align="center">Video</h1>
+<img src="GA144.jpg">
+The GA144 is fully capable of generating video. Three D/A outputs produce red, green and blue signals. A digital output provides composite sync. It does take some computers and careful programming, but diagrams, text and images can be drawn. GreenArrays has an App Note that describes how to connect such outputs to a 15-pin VGA jack on their Evaluation Board.
+
+<p>It is extraordinarily satisfying to see an image as the result of your work. And visual output is invaluable in developing applications. For example, a graph of a sine function aids in verifying its correctness and a plot of random numbers lends credibility to their randomness.
+
+<p>As with all Forth applications, the programmer is very close to the hardware. You don't call a DLL to generate a rectangle in video memory. You devise a method of putting a rectangle on the screen, given constraints of memory, time and computers. The object is not to display a rectangle, but to do so nicely.
+
+<p>I have many ways of generating images. These were various explorations hopefully leading to the best one. But I conclude that that is neither possible nor desirable. Each way has advantages and drawbacks, which may be optimal for a particular class of image. The goal has to be simplicity and that of a local nature. Universal simplicity is an oxymoron.
+
+<p>I propose to discuss these several ways of generating images. These are not pre-packaged applications, but guidance in developing your own. My various images change almost everytime I display them. They are not stabilizing, but becoming both simpler and more general.
+
+<p>It's curious and disheartening that computer graphics has converged upon video cards that are complex, power-hungry and undocumented. Artists are forced into a pre-defined medium. Here's a way to restore imagination and creativity.
+
+<h2>Sync</h2>
+Let's agree to talk about a monitor that draws a raster display from top to bottom of the screen. There are 1024 pixels available in each of 768 scan lines. It can refresh the screen from 50-70 times a second. This is a fairly standard monitor of which my HP vp15 is an example. My <a href="b966.htm">code</a> works on this monitor and several others, including 2 projectors. But I have a monitor on which it fails.
+
+<p>A monitor requires a framing signal. This is a holdover that goes back 70? years to NTSC broadcast standards. The simplest such signal is composite sync. It is basically a negative pulse at the start of each scan line. The 1.8V swing of a GA144 output seems adequate. This is inverted to a positive pulse during vertical retrace.
+
+<p>The complete signal is too long to display. It must reside in your mind. I generate 806 scan lines:<ul>
+<li>9 blank
+<li>6 inverted indicating top-of-frame
+<li>23 blank
+<li>768 image</ul>
+The blank lines control vertical position.
+
+<p>I make each scan line 25.6 us long. That's 39 KHz, the slowest my monitor will accept. That produces a 49 Hz refresh. This slowness allows me more time per pixel or more pixels per line.
+
+<p>Each line has 3 delays:<ul>
+<li>2 us pulse
+<li>start delay
+<li>line delay</ul>
+The start delay adjusts horizontal position, though the monitor may need to be adjusted to help. The line delay fills out 25.6 us.
+
+<p>I generate this signal in node 300 using pin 14 (300.17) which is connected to the monitor's horizontal sync. It's useful to have an oscilloscope to check the horizontal frequency, though the entire signal is too long to see. With this signal alone the monitor should be happy, displaying a black screen. Maybe a different shade of black than no signal at all so it might be visible.
+
+<h2>Start pulse</h2>
+In addition to the framing signal, node 300 generates a start signal for the video output nodes. This indicates the start of one of the 768 display lines. It is a positive pulse output on pin 15 (300.1) which is to be connected to pin 71. Thence it is distributed to D/A nodes 709, 713 and 715.
+
+<p>Such a signal means the video nodes do not have to be aware of all 806 lines, only the visible ones. This is a net simplification, though it costs 2 pins. A future chip might arrange this better.
+
+<p>The timing of this start pulse varies. One of my applications requires it occur early, to accomodate a delay in pixels arriving. For others this is inconvenient.
+
+<h2>Blue screen of death</h2>
+As the simplest video output, I programmed a blue screen. This requires <a href="b1178.htm">code</a> in node 717 to put a signal on pin 70 which is to be connected to monitor's blue input.
+
+<p>Pin 70 is node 717's analog output. Writing 41af to the io register will put ~700 mV on a 75-Ohm load, which is the monitor's termination. This will put bright blue on the screen. It is not the highest voltage available, but the highest the monitor can use. (As  empirically determined.) Correspondingly, writing 4155 will put 0 V out and black on the screen.
+
+<p>My monitor is unhappy with a constant blue signal. It must be turned off during sync. So node 717 must turn it on at Start, time a duration and turn it off. My duration is 8346 unexts for full screen.
+
+<p>A video node waits for Start. That is, it waits for pin 71 to go high (by writing to up port). While waiting, of course, it uses no power. This has the considerable advantage that it need not fill out a scan line. When it has finished with what it wants to display, it generates black and waits for the next Start. So by shortening the duration of blue, you can draw a bar rather than full screen.
+
+<p>Notice what we're doing here. We're generating a display on the fly. Not filling memory and reading it back. This is a huge simplification and offers great versatility.

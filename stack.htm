@@ -1,0 +1,49 @@
+<h1 align="center">Push-down Stacks</h1>
+"So the last will be first and the first will be last." Matthew 20:16
+
+<p>And there are other references in the Bible to a last-in first-out (LIFO) stack. Authoritative approval indeed.
+
+<h2>Concept</h2>
+<img src="stack.jpg" align="right">
+A LIFO stack is also called a push-down stack. The word 'stack' comes from a stack of plates, where the last one placed on the stack is the first one removed. Leo Brodie uses a can of tennis balls as an example. The notion is used for queuing theory and inventory accounting as well as computers.
+
+<p>Computers often use a stack to handle nested subroutines calls. When a subroutine is called, the return address is pushed onto the stack. When that subroutine calls another, its return address is pushed. When a return is encountered, it pops an address off the stack. Thus nesting acts naturally in a LIFO manner.
+
+<p>The book <a href="http://www.forth.com/starting-forth">Starting Forth</a> has charming cartoons illustrating stack behavior.
+
+<h2>Two stacks</h2>
+Forth has 2 push-down stacks; arrays that can store numbers: data or addresses.  One for nesting subroutines (return) and another for parameters used by those subroutines (data). The data stack is most visible and is explicitly controlled by the programmer.
+
+<p>Forth 'words' are like subroutines: When referenced, a return address is pushed onto the return stack. This stack is also used for loop counters. They can be nested just like words, and interspersed with return addresses, without conflict.
+
+<p>Some words push numbers onto the data stack. Literals, words that look like numbers, do that. For example<ul>
+<li>Initial stack: . . .
+<li>After 12345: . . . 12345</ul>
+Other words change the stack<ul>
+<li>Initial stack: 123
+<li>After @: 16 (where the address 123 contains 16)</ul>
+Or change the size of the stack<ul>
+<li>Initial stack: 123 100
+<li>After +: 223</ul>
+
+One of the challenges to a new Forth programmer is learning to manage this data stack. It vastly reduces the need for named variables and changes the trade-offs when analysing a problem.
+
+<p>The 2 Forth stacks are connected: the top of the data stack can be pushed onto the return stack by the operator 'push'. Likewise the top of the return stack can be pushed onto the data stack by the operator 'pop'. They can be viewed as a single stack accessed from the center. This allows the return stack to be used for temporary storage (of course within a subroutine or loop).
+
+<p>The language C has a single stack that combines the return and data stacks. That is clumsy and complicated compared to separate stacks.
+
+<h2>Hardware</h2>
+It's certainly possible to emulate a push-down stack in software. Simply incrementing and decrementing a pointer properly. Ofttimes a hardware register is available for this.
+
+<p>GreenArrays' computers have a unique mechanism for implementing stacks with hardware: a stack is a set of registers with a pointer to the one currently on top. The pointer is moved up or down as required. The data is not moved, merely a pointer to the register in which the data is stored. This saves energy.
+
+<p>Moreover, the stack is circular. There is no beginning or end; no concept of empty or overflow. Just the pointer to the current top. If too many numbers are pushed onto the stack, the oldest are overwritten. If too many numbers are popped from the stack, they begin to repeat.
+
+<p>Again: the programmer is responsible for managing the stack. This is not difficult, merely requires attention. And often things can be abandoned on the stack, rather than take the trouble to remove them.
+
+<h2>Consequences</h2>
+Given a data stack, subroutine calling sequences vanish. Parameters are expected on the stack and results placed there. There can be more or fewer results than parameters. The cost of a subroutine is merely the call and return. This allows many small subroutines and more intense factoring of a problem.
+
+<p>In hardware, instructions become 0-operand. That is, an instruction such as + need not be told where its operands are. They are on the stack. Thus + can simply be a 5-bit op-code, and instructions can be packed, several per word of memory. This reduces the number of instruction fetches from memory, increasing speed of execution and density of instructions.
+
+<p>GreenArrays' F18 computer can pack 4 5-bit instructions into an 18-bit word. It's 64-word RAM can hold up to 256 instructions; and another 256 in ROM. Thanks to the push-down stack.

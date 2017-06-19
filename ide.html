@@ -1,0 +1,25 @@
+<body bgcolor="#d0ffd0">
+
+<h1>IDE hard disk driver
+
+<br><font color="red">bsy <font color="green">1f7 p@ 80 and if bsy ; then ;
+<br><font color="red">rdy <font color="green">1f7 p@ 8 and if 1f0 a! 256 ; then rdy ;
+<br><font color="red">sector <font color="green">1f3 a! swap p!+ /8 p!+ /8 p!+ /8 e0 or p!+ drop p!+ drop 4 * ;
+<br><font color="red">read <font color="green">20 sector 256 for rdy insw next drop ;
+<br><font color="red">write <font color="green">bsy 30 sector 256 for rdy outsw next drop ;
+<hr></font>
+
+<h1>comments
+<br><font color="red">p@ <font color="0">read 8-bit port
+<br><font color="red">p!+ <font color="0">write 8-bit port, increment port
+<br><font color="red">insw <font color="0">read n words from port
+<br><font color="red">outsw <font color="0">write n words to port
+<br><font color="red">/8 <font color="0">shift right 8 bits
+
+<p><font color="red">bsy <font color="0">wait till busy bit clear
+<br><font color="red">rdy <font color="0">wait till data-ready bit set
+<br><font color="red">sector <font color="0">set logical sector and command
+<br><font color="red">read <font color="0">read 256 sectors
+<br><font color="red">write <font color="0">write 256 sectors
+</font>
+</body>

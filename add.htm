@@ -1,0 +1,19 @@
+<h1 align="center">Add</h1>
+The add operator (<font color="green">+</font>) has subtle timing. If you really care about space or time, you can sometimes optimize it.
+
+<p><font color="green">+</font> (and <font color="green">+*</font>) must have had time for carry to propagate. This usually requires that a <font color="green">.</font> instruction preceed it. But you don't need a <font color="green">.</font> if <font color="green">+</font> is<ul>
+<li>the first instruction of a definition
+<li>the first instruction returning from a definition
+<li>following <font color="green">if -if next unext</font>
+<li>following a <font color="green">then</font> that's preceeded by a <font color="green">;</font>
+<li>in slot 3
+<li>in slot 0, following a literal (<font color="green">@p !p</font>) in slot 3
+<li>following a <font color="green">dup</font> (no ripple)
+</ul>
+If you know carry won't ripple more than 9 places, you don't need a <font color="green">.</font> But this is difficult to know, since it matters what number was in S before the latest push. (Carries were established which may have to be changed.)
+
+<p>Here's an example<ul>
+<li><font color="green">fff fff .. 0 +</font></ul>
+The 2 fffs establish carries. Rippling for the <font color="green">0</font> starts at the end of slot 0, but won't be finished by the end of slot 1. The result is 011ff instead of fff. Grossly incorrect.
+
+<p><b><font color="red">If in doubt, use a <font color="green">.</font></b></font>

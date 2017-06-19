@@ -1,0 +1,23 @@
+<h1 align="center">A/D Noise Immunity
+<br>Greg Bailey</h1><h3>
+This note briefly addresses inherent noise amelioration in the current Analog to Digital Converter.
+
+<p>Conventional ADC's depend on having a means for holding an input voltage stable to within 1 LSB for a period of time during which the conversion is done.  This period of time may vary from very short, as in the case of flash converters, to very long, as in the case of classical successive approximation converters.  If the input voltage varies, even to a single LSB, during conversion, it can lead to much larger errors in the converted value, depending on the type and characteristics of the converter.
+
+<p>Since a sample and hold will capture a voltage across a very narrow window of time, this sample is subject to capturing a noise spike, and to all of the other classical forms of aliasing.  These require, usually, some form of antialiasing filter before the sample and hold circuit.  If spiky noise is part of the problem set, and if the application leans toward instrumentation as distinguished from signal processing, a filter might be enhanced with circuits designed to address the noise, such as slew rate limiters or tailored FIR filters.
+
+
+<p>The present A/D converter design works quite differently.  Instead of capturing an instantaneous voltage and converting it, this design consists of a VCO whose frequency is controlled by the input voltage, and whose output drives a binary counter.  The first order effect of this circuit is that the value in the counter represents the *moving
+average* of the input voltage across the interval of time it takes for the 18 bit counter to roll over.  The VCO frequency varies from about
+2 to 4 gigacounts per second, so the maximum period of time for rollover varies from about 65.5 to 131.07 uS and taking the counter as a window, the window frequency across which it averages varies from about 7.6 KHz to 15.3 KHz.
+
+<p>In practical use, input voltage is measured by computing the difference, modulo 2**18, between two counter values separated by a measured amount of time.  The longest practical amount of time is as indicated above,
+65.5 uS which would, if done continuously, yield a sampling frequency of 15.3 KHz.  This frequency yields the greatest resolution; sampling more frequently simply reduces the resolution of the samples, while proportionally increasing the window frequency of the counter.  On the other hand, the window can be effectively lengthened, and its frequency reduced, by taking multiple consecutive samples and averaging them in software.
+
+<p>In terms of filtering, then, consider the case of continuously sampling the counter at an *effective* frequency of 1 KHz.  Each reading of the counter yields a number that represents the moving average voltage of the input over the past 65 to 131 microseconds.  We sample the counter at a *real* rate of, say, 32 KHz, averaging 32 consecutive differences to produce one *effective* sample.  Each of these software averages, pro- duced at 1 KHz, then represents the moving average over 1 mS, which would be equivalent to a first order lowpass filter whose 3dB point lay around 500 Hz.  Note that this is an *analog* moving average, not a
+*digital* moving average, since what is being integrated is the continuous voltage at the input rather than a sequence of discrete time samples.
+Additionally, this is not just a first order filter because there are
+2.3 pF of pad capacitance before we get to the VCO and some sluggishness in response of the VCO to input voltage changes.  While we have not measured the attenuation of high frequency spiky noise, it should be excellent since at those relatively high frequencies this filter will act like an analog, not a digital, filter, and so the rolloff of 6 dB per octave should continue indefinitely without aliasing.  Thus, in this example, with a 1 KHz sampling frequency, noise at 1 KHz is attenuated
+9 dB; noise at 10 KHz, 29 dB; at 100 KHz, 49 dB, due to the averaging alone and ignoring the second order effects mentioned above.
+
+<p>While this will not solve every problem, our point is that the basic A/D design incorporates the equivalent of a first order antialiasing and antinoise filter which is already 15 dB down at twice the sampling frequency and 21 dB down at the 4x frequency.  Further filtering, outside in hardware or inside the chip in software, can always be added if it proves to be necessary; as, for example, the reduction in filter frequency achieved by software extension of the sampling interval via averaging such as is used above to extend the sampling frequency below the counter rollover limit of 15.3 KHz.

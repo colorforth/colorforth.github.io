@@ -1,0 +1,22 @@
+<body bgcolor="#d0ffd0">
+
+Updated July 31
+<h1>Trouble with 'save '</h1>
+Floppy controllers are awfully slow. With a fast computer/bus it may miss commands or data bits. COLOR.COM may not respond to 'save ' <em>You</em> must somehow copy COLOR.COM to sector 0 to make a bootable floppy.<ul>
+<li>DOS can write a bootable floppy with DEBUG. In a DOS window type:<ul>
+   <li>debug COLOR.COM
+   <li>w100 0 0 7e
+   <li>q</ul>
+<li>Unix can write a bootable floppy with dd or cp
+<li>Linux/BSD can write a bootable floppy with fdimage.exe</ul>
+
+<h1>Trouble with display</h1><ul>
+<li>The graphic controller must successfully locate the frame buffer
+<li>It must support VESA mode 117 (1024x768 rgb: 565)
+<li>The monitor must support same
+<li>If COLOR.COM leaves the monitor dark, try typing 'save ' blindly. The qwerty word 'save ' is an alias for the <font color="red">color</font><font color="green">Forth</font> word (terminal space). If the floppy is written, booting it may successfully display.
+<li>If booting leaves the monitor dark, try booting both after power-up and after running Windows/Unix. Their initialization may be different than BIOS'. A dark monitor is probably caused by a non-zero OFFSET from the beginning of the frame buffer. Which does not have a standard location in PCI register space.</ul>
+
+<h1>No guarantee</h1>
+It may not be possible to run <font color="red">color</font><font color="green">Forth</font> on your computer. You're welcome to examine the source and modify it to suit. Suggestions to expand the universe of acceptable computers are welcome.
+</body>

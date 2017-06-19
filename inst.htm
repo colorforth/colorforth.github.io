@@ -1,0 +1,398 @@
+<h1 align="center">colorForth Instructions</h1><h3>
+Here are the 33 instructions for the 18-bit core. There are words about each and examples of their use. There are some tricky things you can do, particularly with <font color="green">or <font color="black">and <font color="green">-<font color="black">.
+
+<p>The names of instructions are easily changed and continually debated. These are the opcodes and my current preference for names:
+
+<table>
+<tr><th><th><h3>Jumps<th><th><h3>Memory<th><th><h3>Arithmetic<th><th><h3>Register
+<tr><td><h3>00<td><h3>;<td><h3>08<td><h3>@p<td><h3>10<td><h3>+*<td><h3>18<td><h3>dup
+<tr><td><h3>01<td><h3>ex<td><h3>09<td><h3>@+<td><h3>11<td><h3>2*<td><h3>19<td><h3>pop
+<tr><td><h3>02<td><h3>jump<td><h3>0a<td><h3>@b<td><h3>12<td><h3>2/<td><h3>1a<td><h3>over
+<tr><td><h3>03<td><h3>call<td><h3>0b<td><h3>@<td><h3>13<td><h3>-<td><h3>1b<td><h3>a
+<tr>
+<tr><td><h3>04<td><h3>unext<td><h3>0c<td><h3>!p<td><h3>14<td><h3>+<td><h3>1c<td><h3>.
+<tr><td><h3>05<td><h3>next<td><h3>0d<td><h3>!+<td><h3>15<td><h3>and<td><h3>1d<td><h3>push
+<tr><td><h3>06<td><h3>if<td><h3>0e<td><h3>!b<td><h3>16<td><h3>or<td><h3>1e<td><h3>b!
+<tr><td><h3>07<td><h3>-if<td><h3>0f<td><h3>!<td><h3>17<td><h3>drop<td><h3>1f<td><h3>a!
+</table>
+
+
+<p>Registers are:<ul>
+<li>R - top of return stack
+<li>A - address/scratch
+<li>B - address
+<li>P - program counter
+<li>I - instruction word
+<li>T - top of data stack
+<li>S - second number on data stack</ul>
+
+<h1>Jump Instructions</h1>
+Jump to address in register P, I or R
+
+<h2>00 ;</h2>
+Jump thru R (destructive)
+<br>The word <font color="green">;<font color="black"> is Forth syntax to end a definition. Here it doesn't necessarily mean end, but return<ul>
+<li>Return from subroutine (return to caller):
+<br><font color="green">;<font color="black">
+<li>Computed jump - address in T:
+<br><font color="green">push ;<font color="black">
+<br>Useful for a vectored jump into a table
+</ul>
+
+<h2>01 ex</h2>
+Jump thru R, save P in R
+<br>Execute. Sometimes called co-routine jump, it returns to caller while saving the current address. This can be repeated to<ul>
+<li>Interleave 2 threads
+<li>Computed call - address in T:
+<br><font color="green">push ex<font color="black">
+</ul>
+
+<h2>02 jump</h2>
+Jump thru I
+<br>The opcode is not used explicitly. The compiler generates it
+<br>The address is in the instruction, either 10, 8 or 3 bits depending on slot<ul>
+<li>Tail recursion:
+<br>The compiler will turn a call followed by <font color="green">;<font color="black"> into a jump to save time and space
+<li>Implement else:
+<br><font color="green">if . . else . . . then<font color="black">
+<li>Construct a table of jumps
+<br>Often more efficient than conditional jumps
+</ul>
+
+<h2>03 call</h2>
+Jump thru I, push current address to R
+<br>The opcode is not used explicitly. Referencing any defined word generates a call<ul>
+<li>Subroutine call:
+<br><font color="red">word<font color="green"> . . . ;
+<br>word<font color="black">
+</ul>
+
+<h2>04 next</h2>
+This instruction has 2 forms:<ul>
+<li>If the low-order bit is 0 it's called unext:<br>
+If R is non-zero, jump to slot 0 and decrement R. Otherwise pop R and execute the next slot.
+<br>Discards the address left by <font color="green">for<font color="black">. Very efficient loop since no instruction fetchs required.<ul>
+<li>Delay loop:
+<br><font color="green">for unext<font color="black">
+<li>Multiply:
+<br><font color="green">for +* unext<font color="black">
+<li>Shift:
+<br><font color="green">for 2* unext
+<br>for 2/ unext<font color="black">
+<li>Move data to/from ports
+<br><font color="green">for @+ !b unext
+<br>for @b !+ unext
+<br>for @p !+ unext
+<br>for @+ !p unext<font color="black">
+</ul>
+
+<li>If the low-order bit is 1:<br>
+If R is non-zero, jump thru I and decrement R. Otherwise pop R
+<br><font color="green">For<font color="black"> expects loop-count (-1) on stack and is defined as:
+<br><font color="green">push begin<font color="black">
+<br><font color="green">Begin<font color="black"> fills the current instruction word with <font color="green">.<font color="black"> so that the loop begins in the next word. Leaves address on compiler stack for next to use<ul>
+<li>Count-down loop:
+<br><font color="green">for . . . . next<font color="black">
+<br>Prefer unext if only 3 instructions in loop
+<li>Search for match:
+<br><font color="green">for @+ over or if drop <font color="#cc9900">swap<font color="green"> next <font color="black">no match <font color="green">then <font color="black">match
+<br><font color="cc9900">Swap<font color="black"> is executed at compile time to access the address for <font color="green">next<font color="black">
+<li><font color="red">/mod <font color="green">for begin over over . + -if drop 2* <font color="cc9900">swap <font color="green">next ; then over or or - 2* - next ;<font color="black">
+<br>Divide operation: trial subtract and shift in either 0 or 1
+</ul></ul>
+
+<h2>06 if</h2>
+Jump thru I if T is zero
+<br><font color="green">If<font color="black"> leaves its address on compiler stack for <font color="green">then<font color="black"> to complete. <font color="green">Then<font color="black"> may abort if address won't fit in slot<ul>
+<li>Test for non-zero (true):
+<br><font color="green">if . . . then<font color="black">
+<li>Test for unequal:
+<br><font color="green">or if . . . then<font color="black">
+</ul>
+
+<h2>07 -if</h2>
+Jump thru I if T is positive<ul>
+<li>Absolute value:
+<br><font color="red">abs <font color="green">-if - 1 . + then ;<font color="black">
+<li>Maximum:
+<br><font color="red">max <font color="green">- over . + - -if drop ; then + ;<font color="black">
+<li>Minimum:
+<br><font color="red">min <font color="green">- over . + - -if + ; then drop ;<font color="black">
+</ul>
+
+
+<h1>Memory Instructions</h1>
+Fetch or store thru registers A, B, P.
+<br>@ and ! are Forth abbreviations for 'fetch' and 'store'. Fetch pushes the data stack; store pops it
+
+<h2>08 @p</h2>
+Fetch thru P, increment P
+<br>Increment suppressed when executing from port<ul>
+<li>Fetch a number:
+<br><font color="green">123<font color="black">
+<br>Uses 1 slot plus 1 word
+<li>Fetch 4 numbers:
+<br><font color="green">100 200 300 400<font color="black">
+<br>Uses 4 slots plus 4 words
+<li>Name a constant:
+<br><font color="red">pi <font color="green">314 ;<font color="black">
+<br>Uses 2 slots plus 1 word
+<li>Add a number:
+<br><font color="red">1+ <font color="green">1 . + ;<font color="black">
+<br>Uses 4 slots plus 1 word
+</ul>
+
+<h2>09 @+</h2>
+Fetch thru A, increment A
+<br>Increment suppressed when referencing port<ul>
+<li>Check-sum memory:
+<br><font color="green">0 63 for @+ . + unext<font color="black">
+</ul>
+
+<h2>0a @b</h2>
+Fetch thru B<ul>
+<li>Read status:
+<br><font color="green">io b! @b<font color="black">
+</ul>
+
+<h2>0b @</h2>
+Fetch thru A<ul>
+<li>Read status:
+<br><font color="green">io a! @<font color="black">
+</ul>
+
+<h2>0c !p</h2>
+Store thru P, increment P<ul>
+<li>Send status to port from which you're executing instructions:
+<br><font color="green">@b !p<font color="black">
+<li>Make a constant (x) into a variable:
+<br><font color="red">x! <font color="green">@p drop !p ;
+<br><font color="red">x <font color="green">100 ;<font color="black">
+<br>Avoids using an address register
+</ul>
+
+<h2>0d !+</h2>
+Store thru A, increment A<ul>
+<li>Fill memory from port:
+<br><font color="green">63 for @b !+ unext<font color="black">
+<li>Fill memory executing from port:
+<br><font color="green">63 for @p !+ unext<font color="black">
+</ul>
+
+<h2>0e !b</h2>
+Store thru B
+<br>Be careful to distinguish <font color="green">!b<font color="black"> from <font color="green">b!<font color="black"><ul>
+<li>Set 2 I/O pins
+<br><font color="#005000">30003 <font color="green">!b<font color="black">
+<li>Reset 3 I/O pins
+<br><font color="#005000">2000a <font color="green">!b<font color="black">
+</ul>
+
+<h2>0f !</h2>
+Store thru A<ul>
+<li>Set first I/O pin
+<br><font color="#005000">30000 <font color="green">!<font color="black">
+</ul>
+
+<h1>ALU Instructions</h1>
+Unary and binary operations:
+
+<h2>10 +*</h2>
+Multiply step: add S to T if A0=1 then shift T and A right. The multiplicand (S) is signed; the multiplier (A) is unsigned<ul>
+<li>Integer multiply: 36-bit result, buried multiplicand
+<br><font color="red">*</font> nm-nhl <font color="green">a! 0 17 for +* unext a ;</font>
+<br>unext provides the delay between <font color="green">+*</font>s for carry to propagate. No delay is needed for the initial add to 0
+<li>Short integer multiply: 9-bits x 9-bits yields 18-bits
+<br><font color="red">*</font> nm-p <font color="green">a! 0 8 for +* unext drop drop a ;</font>
+<br>If the multiplicand (S) was shifted 9 places left the result is right-justified
+</ul>
+
+<h2>11 2*</h2>
+Shift T left; shift 0 into bit 0<ul>
+<li>Shift 1 into bit 0:
+<br><font color="green">- 2* -</font>
+<li>Multiply by 3:
+<br><font color="green">dup 2* . +<font color="black">
+<li>Multiply by 5:
+<br><font color="green">dup 2* 2* . +<font color="black">
+<li>Multiply by 6:
+<br><font color="green">2* dup 2* . +<font color="black">
+<li>Multiply by 7:
+<br><font color="green">dup 2* dup 2* . + . +<font color="black">
+<li>Test right-port read-status:
+<br><font color="green">@b 2* -if<font color="black">
+<li>Test down-port read-status (after right-port):
+<br><font color="green">2* 2* -if<font color="black">
+</ul>
+
+<h2>12 2/</h2>
+Shift T right; sign bit unchanged<ul>
+<li>Divide by 4:
+<br><font color="green">2/ 2/</font>
+</ul>
+
+<h2>13 -</h2>
+One's complement T<ul>
+<li>Test for positive:
+<br><font color="green">- -if<font color="black">
+<li>Negate:
+<br><font color="green">- 1 . +<font color="black">
+<li>Subtract T from S:
+<br><font color="green">- . +<font color="black">
+<br>This result is 1 too small. It can be corrected during additional arithmetic
+<li>Subtract S from T:
+<br><font color="green">- . + -<font color="black">
+<li>Subtract T from S:
+<br><font color="green">push - pop . + -<font color="black">
+<li>Construct -1:
+<br><font color="green">dup or -<font color="black">
+<li>Construct -2:
+<br><font color="green">dup or - 2*<font color="black">
+<li>Construct +1:
+<br><font color="green">dup or - 2* -<font color="black">
+<br>Same number of slots as literal 1
+</ul>
+
+<h2>14 +</h2>
+Add S to T (discard S)<ul>
+<li>Add:
+<br><font color="green">. +<font color="black">
+<br>Dot required if stack has just changed. Otherwise carry can propagate only 9 bits
+</ul>
+
+<h2>14 +</h2>
+Add S to T with carry
+<br>Requires bit 9 of P be set<ul>
+<li>Set P9:
+<br><font color="#cc9900">200 org <font color="red">arithmetic <font color="green">. . . ;
+<br><font color="#cc9900">arithmetic<font color="black">
+<br>P9 reset upon return from arithmetic
+<li>Add:
+<br><font color="green">. +<font color="black">
+<li>Return and clear carry: 1 if carry 1; 0 if carry 0
+<br><font color="green">dup dup or dup +<font color="black">
+<li>Return and preserve carry: 0 if carry 1; -1 if carry 0
+<br><font color="green">dup dup - . +<font color="black">
+<li>Set carry:
+<br><font color="green">dup or - dup +</font> (trashes stack)
+</ul>
+
+<h2>15 and</h2>
+Bit-wise and of S and T<ul>
+<li>Mask low-order byte:
+<br><font color="#005000">ff <font color="green">and<font color="black">
+<li>Mask sign bit:
+<br><font color="#005000">20000 <font color="green">and<font color="black">
+<li>Return zero if T was a power of 2:
+<br><font color="green">dup -1 . + and<font color="black">
+</ul>
+
+<h2>16 or</h2>
+Bit-wise exclusive-or of S and T<ul>
+<li>One's complement T:
+<br><font color="#004000">3ffff <font color="green">or<font color="black">
+<br>Not useful since it uses 5 slots instead of 1 ( - )
+<li>Change sign bit:
+<br><font color="#004000">20000 <font color="green">or<font color="black">
+<li>Inclusive-or:
+<br><font color="green">over - and or<font color="black">
+<li>nip:
+<br><font color="green">over or or<font color="black">
+<br>Uses a stack location
+<li>swap:
+<br><font color="green">over push over or or pop</font>
+</ul>
+
+<h2>17 drop</h2>
+Discard T<ul>
+<li>Discard R:
+<br><font color="green">pop drop<font color="black">
+<li>nip (discard S):
+<br><font color="green">push drop pop<font color="black">
+<br>Uses a return stack location
+</ul>
+
+<h1>Stack Instructions</h1>
+
+<h2>18 dup</h2>
+Create a working copy of T<ul>
+<li>construct a 0 (discards T):
+<br><font color="green">dup or<font color="black">
+<li>Preserve the stack while using it destructively:
+<br><font color="green">dup dup or<font color="black">
+<li>Square a number:
+<br><font color="green">dup *<font color="black">
+<li>Cube a number:
+<br><font color="green">dup dup * *<font color="black">
+</ul>
+
+<h2>19 pop</h2>
+Fetch R (destructive)<ul>
+<li>Retrieve something saved
+<li>Retrieve a loop index:
+<br><font color="green">pop dup push<font color="black">
+<li>Discard loop index and exit loop:
+<br><font color="green">pop drop ;<font color="black">
+<li>Discard a return address. Return to the caller's caller:
+<br><font color="green">pop drop ;<font color="black">
+</ul>
+
+<h2>1a over</h2>
+Fetch S (non-destructive)<ul>
+<li>Fetch an increment:
+<br><font color="green">over . +<font color="black">
+<li>Working copy of two numbers:
+<br><font color="green">over over<font color="black">
+<li>Swap T and S (leaving S behind)
+</ul>
+
+<h2>1b a</h2>
+Fetch A (non-destructive)<ul>
+<li>Retrieve something saved
+<li>Read address for decrementing:
+<br><font color="green">a over . +<font color="black">
+</ul>
+
+<h2>1c .</h2>
+Do nothing<ul>
+<li>Fill unused slots
+<li>Delay:
+<br><font color="green">!b . !b<font color="black">
+<li>Delay before add:
+<br><font color="green">. +<font color="black">
+<li>Delay loops:
+<br><font color="green">for . unext
+<br>for . . unext
+<br>for . . . unext<font color="black">
+</ul>
+
+<h2>1d push</h2>
+Push T into R<ul>
+<li>Set loop count
+<li>Expose deeper stack:
+<br><font color="green">push over<font color="black">
+<li>nip:
+<br><font color="green">push drop pop<font color="black">
+<br>Uses a return stack location
+<li>swap:
+<br><font color="green">over push push drop pop pop</font>
+<br>Uses 2 return stack locations
+<li>Decrement non-zero number:
+<br><font color="green">push <font color="#cc9900">here 1 + <font color="green">next pop<font color="black">
+<li>clip:
+<br><font color="green">push max pop min<font color="black">
+</ul>
+
+<h2>1e b!</h2>
+Store into B
+<br>Be careful to distinguish <font color="green">b!<font color="black"> and <font color="green">!b<font color="black"><ul>
+<li>Set <font color="green">@b !b<font color="black"> address
+</ul>
+
+<h2>1f a!</h2>
+Store into A<ul>
+<li>Set <font color="green">@ !<font color="black"> address
+<li>Save top of stack
+<li>swap:
+<br><font color="green">push a! pop a
+</ul>

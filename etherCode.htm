@@ -1,0 +1,105 @@
+<h1 align="center">etherForth Code</h1>
+Here are some blocks of etherCode. This is code I wrote for my own use. I present it here to illustrate using GreenArrays' Eval Board and programming the GA144. The formatting conventions of etherCode are described below.
+
+<p>I'm the only one using etherForth. GreenArrays has other versions of colorForth much better documented. But the code looks much the same.
+
+<p>So far there's no way to download etherCode. So the screen shots show code which must be re-typed if interesting. I doubt if anyone would want the code exactly as displayed, anyway.
+
+<p>Each block of code is supposed to have a shadow block of comments. Some do. But more extensive comments are provided here. The code is not necessarily optimal, merely good enough. Improvements can always be made to code or hardware, but the greatest improvement is always in the strategy/algorithm.
+
+<h2>Video</h2>
+Generating images on a monitor:<ul>
+<li><a href="vga.htm">Socket</a>
+<li><a href="b966.htm">Framing</a>
+<li><a href="b1178.htm">Blue screen</a>
+<li><a href="clock.htm">About 10MHz clock</a>
+<li><a href="b942.htm">10MHz clock</a>
+<li><a href="b1128.htm">Clocked framing</a>
+</ul>
+
+<h2>Communication</h2>
+Routing data about the chip:<ul>
+<li><a href="wire.htm">About wire nodes</a>
+<li><a href="b882.htm">Wire node</a>
+<li><a href="b1100.htm">Best wire node</a>
+</ul>Routing packets:<ul>
+<li><a href="ef.htm">About ether</a>
+<li><a href="b900.htm">Ether</a>
+<li><a href="b978.htm">Serdes master</a>
+<li><a href="serial.htm">Serial input</a>
+</ul>
+
+<h2>Dump</h2>
+An example of text output: displays 64 octal words of RAM.<ul>
+<li><a href="b856.htm">Formatting image</a>
+<li><a href="b852.htm">Slicing characters</a>
+<li><a href="b854.htm">Character font</a>
+<li><a href="b848.htm">Pixel display</a>
+</ul>
+
+<h2>Memory</h2><ul>
+<li><a href="var.htm">Variables</a>
+<li><a href="mem.htm">Using local RAM</a> <font color="red">Not tested</font>
+<li>Eval board memory<ul>
+   <li><a href="flash.htm">SDI Flash</a>
+   <li>MMC Flash (pending)
+   <li><a href="b1360.htm">16-bit SRAM</a>
+   <li><a href="b1158.htm">18-bit SRAM</a>
+</ul></ul>
+
+
+<h2>Functions</h2>
+Here are some of the functions I've coded. Every function has its own pecularity: range, precision, etc. None are as simple as evaluating a polynomial. They show that a GA144 node can calculate nicely.
+
+<p>It's fun to see a plot of the function. It verifies gross correctness. And displaying errors against a reference will validate accuracy. There's unlimited opportunity to improve and expand this code<ul>
+<li><a href="arith.htm">About c18 arithmetic</a>
+<li><a href="random.htm">Random numbers</a><ul>
+   <li><a href="hist.htm">Histogram</a>
+   <li><a href="e-x2.htm">Gaussian function</a></ul>
+<li><a href="cos.htm">Sine and cosine</a><ul>
+   <li><a href="b1188.htm">Run length video</a>
+   <li><a href="b1190.htm">Scaling</a></ul>
+<li><a href="atan.htm">ArcTangent</a>
+<li><a href="sqrt.htm">Integer square root</a>
+<li><a href="b1206.htm">Logarithm</a>
+<li><a href="b958.htm">Exponential</a>
+</ul>
+
+<h2>Multi-word functions</h2>
+<p>This code resides in a node that will receive instructions and data from a neighbor.<ul>
+<li><a href="cosd.htm">35-bit cosine</a><ul>
+   <li><a href="double.htm">35-bit fraction multiply (pending)</a></ul>
+<li><font color="red">Code below has not been tested</font>. I don't have an application, and when I do they'll be changed to accomodate. I present them as a suggestion.
+
+<li><a href="complex.htm">Complex arithmetic</a>
+<li>2-d vector arithmetic is easy
+<li><a href="3d.htm">3-d vector arithmetic</a>
+<li><a href="rot.htm">3-d vector rotation</a></ul>
+
+<h2>Timing</h2>
+Using the 5GHz a/d counter to time some of this code<ul>
+<li><a href="watch.htm">Stop watch</a>
+<li><a href="timer.htm">Timer</a>
+<li><a href="timings.htm">Timing results</a></ul>
+
+<h2>Astronomy</h2>
+My goal is a graphic display of the night sky. Here are steps along the way:<ul>
+<li><a href="b1170.htm">Local Sidereal Time</a>
+<li><a href="b1168.htm">Big clock</a>
+</ul>
+
+<h2>etherCode format</h2>
+<img src="b1178.jpg">
+<br>This is a sample block of etherCode. Rather simple code that displays a <a href="b1178.htm">blue screen</a>. Some common features of etherCode blocks are:
+
+<p>There is a comment on the first line to identify the code. It includes the node number (as text) and ideally a unique word that colorForth can search for so you don't have to remember block numbers. In this case dth (death).
+
+<p>An etherCode block initializes the code address to 0; ie, it has an implicit <font color="#c0c000">0 org</font>. Code follows; in this case the words sol and go are defined.
+
+<p>The yellow word <font color="#c0c000">init</font> (for initialize) marks the end of code compiled into RAM and the beginning of code that will be executed from the comm port at load time. In this case, register b will point to the io register; register a to the up port. 41af and 4155 will be left on the stack and execution started at go.
+
+<p>This initialization is extremely useful is saving space in RAM. That's not important here, but is a nice habit to form. Much can be done from the port.
+
+<p>The last line tells etherForth where to load the code. It describes a path starting at node 608: go right 9 nodes and turn up. That takes you to node 717.
+
+<p>The grey number <font color="#c0c0c0">007</font>, tells you that code takes 7 words of RAM. This must be less than 041, of course. The number <font color="#c0c0c0">00e</font>, tells you that 14 words will be transferred to 717. The last 7 will be executed (from the down port since that's where ether loads the code).

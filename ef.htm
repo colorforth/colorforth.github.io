@@ -1,0 +1,125 @@
+<h1 align="center">etherForth</h1>
+<h2 align="center">Chuck Moore, April 2012</h2>
+
+<h2>Rationale</h2>
+etherForth is a variant of colorForth that resides on GreenArrays' multi-computer chips. Currently this means the GA144 which has 144 f18a computers.
+
+<p>The Ether is my term for software in every computer's RAM that routes messages about the chip. etherForth depends upon and exploits this vehicle to compile and distribute application code.
+
+<p>As with colorForth, tags are used to identify pre-parsed words in source code. This simplifies and speeds editing and compilation by moving effort from compile time to edit time.
+
+<p>In contrast to classic colorForth's Shannon-coded characters, etherForth uses 6-bit characters preceeded by a 6-bit tag. It also uses 6-bit tokens to indicate f18 instructions. This is designed to provide extremely compact source code that can reside in Flash memory and documenet an embedded application. Code also has to be easy to manage in the small f18 computers.
+
+<p>etherForth is a stand-alone operating system that boots from Flash. It expects external RAM memory, a RGB video monitor and a 4-key keypad. It will be available to anyone with those facilities.
+
+<p>etherForth presently employs the Evaluation Board. It boots on the Target chip and uses Serdes nodes (001 and 1701) to access the Host chip with ethercode. Host nodes are numbered 1000-1717.  The editor is on Target with its video and the compiler on Host with its external memory. The keypad uses the 4 pins of Target node 705 (Flash on host). Plenty of nodes remain unused on both chips.
+
+<h2>Ether</h2>
+The ether supports passing messages at light speed. That is, as fast as communication ports allow. The object code to do this is not simple. It requires 61 words of RAM in each computer in order to route messages, return replies and replicate inself as needed.
+
+<p>From a boot port, ethercode is loaded into a neighbor. Then that neighbor is given a packet with instructions to replicate itself along some path. And other paths until the chip is fully populated. So ethercode exists in 143 computers, with the exception of the boot port.
+
+<h3>Header</h3>
+Each message is a packet with a 4-word header and payload:<ul>
+<li>Header<ul>
+ <li>Focus
+ <li>Address
+ <li>Path
+ <li>Counts</ul>
+<li>Payload</ul>
+
+<h3>Focus</h3>
+All computers reset to waiting for instructions from a neighbor. This is usually termed a 4-port read, although some computers have only 2 or 3 ports. After loading ethercode, computers return to the 4-port read.
+
+<p>It is prudent when receiving instructions to switch from 4-port read to a focused 1-port read. Otherwise confusing input may come from other ports. But more importantly, when replying it avoids a broadcast that can confuse or hang neighbors who are likely hoping for instructions from you.
+
+<p>So the first instruction in an ethernet packet is a focus - a call instruction to the port from which the packet comes. With the program counter set to this port, instructions will be executed only from it and data fetches/stores using @p and !p will go thru it.
+
+<h3>Address</h3>
+This is another call, this time to code in RAM. Ethercode has 2 entry points: one to transfer the payload, another to replicate ethercode and then transfer the payload.
+
+<p>This call has another function. It pushes the previous program counter (port address) to the return stack. From there it can be moved to an address register (pop a!) to receive additional data. And send reply.
+
+<h3>Path</h3>
+This is a word that describes the route the message is to follow. When it becomes 0, the destination has been reached. It is the next neighbor in the current direction.
+
+<p>Path has 3 6-bit fields, each with the format nnnndd<ul>
+<li>dd direction - 2 bits
+<li>nnnn length - 4 bits, 1-15 nodes</ul>
+Thus a path consists of 3 runs: 033333222222111111. Runs 1 and 2 have maximum length 15; run 3 can only go 7 (so the sign bit doesn't propagate with right shift).</ul>
+
+Thus a path might say: go down 3 nodes; then left 10 nodes; then down 2 nodes (3 d 10 l 2 d).
+
+<p>Directions are coded<ul>
+<li>right is 0 (r)
+<li>left is 1 (l)
+<li>up is 2 (u)
+<li>down is 3 (d)</ul>
+These are physical directions on the chip - with node 0 at lower left. As distinct from the ports names which permute from node to node.
+
+<p>The last run can have 0 length. That means to turn in that direction but not move. But this turn cannot be to the right: '0 r' is indistinguishable from 0, which means end of path.
+
+<p>Path limitations constrain the possible routes and affect the assignment of nodes. In practice, this has not been a problem.
+
+<h3>Counts</h3>
+The count word has the format 0rrrrrrrrrrppppppp<ul>
+<li>ppppppp payload - 7 bits 1-128 words
+<li>rrrrrrrrrr reply - 10 bits 0-1023 words
+<li>0 - so the sign bit doesn't propagate with right shift</ul>
+A reply of 0 indicates no reply. A payload of 0 indicates 1 word.
+
+<h3>Link</h3>
+If the route runs into a link node (a node that links to another chip) there needs to be another path to follow in the next chip. This would be the first word in the payload and the header is rearranged by the link node.
+
+<h3>Payload</h3>
+The payload contains instructions to be executed. Focus and address are also instructions; path and counts are data, read by ethercode. Payload starts with instructions that explain what to do with following data. Commonly, store into RAM. After that data is exhausted, more instructions may follow. For example, initialize registers and stack.
+
+<p>Payload has a maximum length of 128 words. This is adequate to fill the 64 words of destination RAM. But is limiting when moving data to/from external RAM. Someday 2 count words may be used.
+
+<p>There must be a payload of at least 1 word. That might just be a return to 4-port read.
+
+<h2>Tags</h2>
+So much for the ether. Examples of use will come later. Now to consider etherForth source code.
+
+A pre-parsed word is preceeded by a 6-bit symbol with format: 11nnnn<ul>
+<li>11 to indicate tag
+<li>nnnn to identify tag</ul>
+Tag assignments are different from colorForth (in octal)<ul>
+<li>0 - tokens
+<li>1 - execute, yellow
+<li>2 - compile, green
+<li>3 - ignore, white
+<li>4 - define, red
+<li>5 - format, blue
+<li>6 - address, grey
+<li>7 -
+<li>10 - end of line
+<li>11 - decimal, yellow
+<li>12 - decimal, green
+<li>13 - decimal, white
+<li>14 - end of block
+<li>15 - octal, yellow
+<li>16 - octal, green
+<li>17 - octal, white</ul>
+A word is a string of 6-bit characters (0-57) terminated by the next tag. A word may be a number, decimal or octal, still a string of characters (different from colorForth that stored numbers in binary). Decimal numbers may have a minus sign. etherForth uses octal numbers. Thus addresses and masks will look different from the hex used in colorForth.
+
+<p>A string of 6-bit tokens (0-57) represents f18 instructions, again terminated by a tag. This is compact and simplifies edit and compile. Tokens 0-37 are the actual f18 op-codes. Except for 2 and 3 (jump and call) which are not named. Others are<ul>
+<li>2 - begin
+<li>3 - end
+<li>40 - then
+<li>41 - for
+</ul>
+
+<h2>Edit</h2>
+The editor is not resident; it is recompiled from source when needed. However the nodes it occupies must be reusable, hence must be able to re-enter 4-port read.
+
+<p>The first task of the editor is to display a block of source code. Video is set for 24 lines of 50 5x7 characters. Edit must display words and tokens, using a look-up for the latter. Each line occupies 30 scan-lines and requires 3 scans for each of the 10 slices of the characters. These slices come from the memory of 2 adjacent nodes.
+
+<p>The source is presently down-loaded from a PC, but will soon be retrieved from external SRAM. SRAM will have been loaded from Flash at power-up. Source is buffered in a couple nodes near the editor and will be rewritten to SRAM when changed. SRAM will be copied to Flash upon request. These data transfers are, of course, done by ethernodes.
+
+<p>A 4-key pad is used to change the source. It can increment/decrement a character or token, add/delete them and cycle colors. Hopefully this will address critism of the colorForth keyboard - but probably not.
+
+<h2>Compile</h2>
+The compiler is resident near external RAM, and includes the RAM access nodes (1007,8,9). It's nodes are loaded with pre-compiled machine code from Flash at power-up. There is no other machine code, applications being compiled from source.
+
+<p>The compiler has to read the 6-bit source coming from SRAM, build a (small) dictionary and compile tokens. It buffers compiled code in 2 adjacent nodes, needing more than 64 words for possible initialization code. And needing to buffer in order to update forward references (if, -if). When finished, the code is moved to its destination.

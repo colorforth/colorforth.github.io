@@ -1,0 +1,36 @@
+<h1 align="center">Random numbers</h1>
+An interesting subject. Suitable for fun applications and subject to many technical considerations.
+
+<h2>Generators</h2>
+I've used several pseudo-random number generators. Linear congruenntial is the best: random, simple and fast. Greg developed this version many years ago and did exhaustive testing.
+
+<p>I've generated random dots on the screen and displayed histograms without seeing any patterns.
+
+<h2><font color="red">*+</font></h2>
+This version of multiply and add is unique to this application. Seed is on the stack and the low-order of the product is replaces it. The high-order is returned as random<ul>
+<li><font color="red">*+</font> nam-nn <font color="green">a! 17 for +* unext push drop a pop ;</font></ul>
+
+<h2>Uniform distribution</h2>
+These decimal numbers have good properties:<ul>
+<li><font color="red">ran</font> n-nn <font color="green">6927 31421 *+ ;</font></ul>
+This generates 18 random bits. Any number can be used as a seed to start generating successive random numbers, including 0.
+
+<p>These pseudo-random numbers are said to have a period of only 65536. So avoid cycles with power-of-2 repetitions. 
+
+<p>Typically you would mask fewer than 18 bits. For display using run-length video: <font color="green">ran 1fff and</font>.
+
+<p>If you want a range that's not a power of 2:<ul>
+<li><font color="red">clip</font> nn-nn <font color="green">1ffff and 100 *. ;</font>
+<li>Used as <font color="green">ran clip</font></ul>
+I'm not persuaded the statistics are as good as with a power of 2, but that's the best I know to do.
+
+<h2>Normal distribution</h2>
+<img src="norm.jpg" align="right">
+Summing 4 uniform numbers yields a normally distributed number. It's a severe test of randomness. I saw it develop on a 256-point histogram, summing 64-bit numbers. Magical.
+
+<p>The range is 4 times the uniform range with the peak centered. The range looks to be 3 sigma.<ul>
+<li><font color="red">norm</font> n-nn <font color="green">ran 2 for push ran pop . + next ;</font></ul>
+
+<h2><font color="red">*.</font></h2>
+17-bit fractional multiply, discarding multiplicand<ul>
+<li><font color="#c0c000">b0 org <font color="red">*.17</font> 0 org</font> <font color="red">*.</font> nf-n <font color="green">*.17 push drop pop ;</font></ul>

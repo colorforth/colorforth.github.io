@@ -1,0 +1,66 @@
+<title>Chuck Moore's Biography</title>
+<meta name="description" content="Chuck" moore invented the forth programming language in 1968. he's ported it to many platforms, coded many applications and designed several forth microprocessors.>
+<meta name="keywords" content="Charles" h moore, computer cowboys, forth, colorforth, software, vlsi, design, tools, computer, microprocessor, uprocessor, chips, mup21, p21, f21, i21, x18, engines, forth inc, mit, stanford, nrao, sao, mohasco, carpets, patents, architecture>
+</head><body bgcolor="#d0ffd0">
+
+<h3>Updated 2010 March
+<h1>Charles H Moore</h1>
+
+<h1>Photos</h1>
+<img src="skip.jpg"><img src="skip67.jpg"><img src="skip72.jpg"><img src="chuck77.jpg"><img src="chuck83.jpg">
+<br>Here're his passport photos for 1956, 67, 72, 77 and 83.
+
+<h1>Education</h1>
+<a href="mit.jpg"><img src="mits.jpg" align="right"></a>
+Born in McKeesport Pennsylvania, near Pittsburg, in 1938. He grew up in Flint Michigan and was <a href="fchs.htm">Validictorian</a> of Central High School (1956). Granted a <a href="merit.htm">National Merit scholarship</a> to MIT where he joined Kappa Sigma fraternity. Awarded a BS in Physics (1960) with a thesis on data reduction for the Explorer XI Gamma Ray Satellite. Then went to Stanford where he studied mathematics for 2 years (1961).
+
+<h1>Programmer</h1>
+<p>He learned Lisp from John McCarthy. And Fortran II for the IBM 704 to <a href="sao.htm">predict</a> Moonwatch satellite observations at Smithsonian Astrophysical Observatory (1958). Compressed this program into assembler to determine satellite orbits (1959). On the other coast, he learned Algol for the Burroughs B5500 to optimize electron-beam steering at Stanford Linear Accelerator Center (1962). As Charles H Moore and Associates, he wrote a Fortran-Algol translator to support a timesharing service (1964). And programmed a real-time gas chromatograph on his first minicomputer (1965). Learned Cobol to program order-entry network at Mohasco (1968). More details are available in an <a href="HOPL.html">unpublished paper</a>.
+
+<img src="nraos.jpg" align="right" width="286" height="340">
+<h1>Forth</h1>
+<p>Chuck invented Forth (1968) and collected his personal software library onto an IBM 1130 which was connected to the first graphics terminal he'd seen (IBM 2250). Soon he used Forth to control the 30ft telescope at Kitt Peak for the National Radio Astronomy Observatory (1970).
+
+<p>And then helped found <a href="http://forth.com/">Forth, Inc</a> (1973) with $5,000 from an angel investor. For the next 10 years, he ported Forth to numerous mini, micro and main-frame computers. And programmed numerous applications from data-base to robotics.
+
+<img src="bytes.jpg" align="right" width="147" height="198">
+<p>In 1980, Byte magazine published a special issue on The Forth Language. <a href="byte.htm">Gregg Williams editorial</a> (2.5MB) provides a rare view of Forth from the outside.
+
+<h1 clear="right">Chips</h1>
+<img src="chips.jpg" align="right" width="252" height="373">
+Finally, he determined to build a Forth chip to realize the architecture intrinsic to Forth. He was a founder of Novix, Inc and implemented the NC4000 (1983) as a gate array (top at right). He developed and sold kits to promote the chip. A derivative was eventually sold to Harris Semiconductor who marketed it as the RTX2000 for space applications (1988).
+
+<p>As Computer Cowboys, he designed the standard-cell Sh-Boom chip (1985), a derivative still being marketed. Then he developed his own design tools for the MuP21 (1990), which has multiple specialized processors. And the <a href="http://ultratechnology.com/">F21</a> (1993) featuring a network interface. He was a founder of the <a href="http://itvc.com/">iTv Corp</a>, and designed the i21, a similar architecture with enhanced performance (1996) aimed at internet applications.
+
+<p>Back as Computer Cowboys, Chuck invented colorForth, ported his VLSI design tools to it and designed the c18 microcomputer (2001), a simple core that can be replicated many times on a chip. Each of his chips has emphasised high performance and low power.
+
+<img src="foots.jpg" align="right" width="126" height="346">
+<h1>Awards</h1><ul>
+<li>Commendation for contributions to software quality, Computer Design, 1983.
+<br>Plaque signed by President Reagan.
+<a href="plaque.htm"><img src="plaques.jpg" align="left" width="140" height="196"></a>
+<li>Life member of FIG
+<li>Honorary Chairman of China FIG, 1987
+<li>Footsteps in an Empty Valley, Offete Enterprises, 1988</ul>
+
+<h1 clear="right">Patents</h1><ul>
+<img src="pat.jpg" align="right" width="420" height="574">
+<li>US 05070451 Forth Specific Language Microprocessor, 1991
+<li>US 05319757 Forth Specific Language Microprocessor, 1995
+<li>US 05440749 High performance, low cost microprocessor architecture, 1995
+<li>US 05530890 High performance, low cost microprocessor, 1996
+<li>US 05604915 Data processing system having load dependent bus timing, 1997
+<li>US 05659703 Microprocessor system with hierarchical stack and method of operation, 1997
+<li>US 05784584 High performance microprocessor using instructions that operate within instruction groups, 1998
+<li>US 05809336 High performance microprocessor having variable speed system clock, 1998
+<li>EP 0870226 Risc microprocessor architecture, 1997
+<li>WO 9715001 Risc microprocessor architecture, 1997
+<li><a href="patents.htm">Moore Microprocessor Portfolio</a></ul>
+
+<h1 clear="right">Recent publications</h1><ul>
+<li>Renaissance Development, Embedded Systems Conference, 1992
+<img src="hopl.jpg" align="right" with="300" height="371">
+<li>The Evolution of Forth; Rather, Coburn, Moore; <em>History of Programming Languages II</em>, Addison-Wesley, 1996
+<li>Some chip documentation is on-line at <a href="http://www.ultratechnology.com/">UltraTechnology</a>.
+<li>This web site, 2001
+</ul>

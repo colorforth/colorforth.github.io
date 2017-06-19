@@ -1,0 +1,162 @@
+<h1 align="center">Arithmetic</h1>
+
+Here is a compendium of arithmetic routines implemented in the <a href="inst.htm">instruction set</a> for GreenArrays' C18 computer. Most have been tested, but you should verify that they're suitable for your use. In particular, exactly how to code them depends upon what other words exist. And any restriction as to the range of numbers can simplify code.
+
+<p>I hope the stack effect of these simple words is obvious. If not, I'll include a stack comment. But multiply and divide leave the addend on the stack. It is often unnecessary and always a nuisance to remove. Call it an abandoned number, which I'll indicate by . (and multiple such by ..) in comments.
+
+<h2>Integer Functions</h2>
+Arithmetic uses <font color="green">+</font> which can often be <a href="add.htm">optimized</a>
+
+<p>The C18 has no subtract instruction, but there are several ways to accomplish subtraction. With a and b on the stack (b on top):<ul>
+<li>Classic Forth: subtract b from a
+   <br><font color="green">- . + 1 . +</font>
+   <br>or
+   <br><font color="green">negate +</font>
+   <br>with negate defined below
+<li>Subtract a from b
+   <br><font color="green">- . + -</font>
+<li>Subtract b from a with result one less
+   <br><font color="green">- . +</font>
+   <br>with 1 to be added later. Often a single fix-up constant can be added at the end of an expression. Sometimes it doesn't matter.</ul>
+
+<p>These are simple functions, often useful:<ul>
+<li><font color="red">negate</font> <font color="green">- 1 . + ;</font>
+<li><font color="red">abs</font> <font color="green">-if - 1 . + then ;
+<li><font color="red">max</font> - over . + - -if drop ; then + ;
+<li><font color="red">min</font> - over . + - -if + ; then  drop ;</font></ul>
+
+<h2>Double-precision Add</h2>
+In this section, a double-precision (36-bit) number has its low-order 18 bits on top of the stack. Such numbers range from -34,359,738,368 to 34,359,738,367.
+
+<p>The ALU must be in add-with-carry mode, which means the code must be compiled at an address with the 200 bit set. The words <font color="#808000">+cy </font>and <font color="#808000">-cy </font>set and reset this bit in the current code address.
+
+<p>Carry must usually be clear to start adding. It will remain clear if the last <font color="green">+</font> doesn't overflow.
+
+<p>Clear carry (carry mode) (This code is usually in a node's ROM, address 2d3.):<ul>
+<li><font color="red">clc</font> <font color="green">dup dup or dup + drop ;</font></ul>
+
+<p>Add an unsigned 18-bit number to a 36-bit number (carry mode, carry clear):<ul>
+<li><font color="red">+u</font> <font color="green">+ push 0 + pop ;</font></ul>
+
+<p>Negate a 36-bit number:<ul>
+<li><font color="red">-d</font> <font color="green">- push - pop 1 +u ;</font></ul>
+If <font color="green">-d</font> falls into <font color="green">+u</font>, it must end with a <font color="green">.</font>
+
+<p>Shift left a 36-bit number:<ul>
+<li>In carry mode, carry clear
+<br><font color="red">2*d</font> <font color="green">dup + push dup + pop ;</font>
+<li>Without carry
+<br><font color="red">2*d</font> <font color="green">-if push - 2* - pop 2* ;
+<br>then push 2* pop 2* ;</font></ul>
+
+<p>Shift right a 36-bit number:<ul>
+<li><font color="red">2/d</font> <font color="green">2/ 2* a! +* a ;</font></ul>
+
+<p>Sign-extend an 18-bit number to 36 bits:<ul>
+<li><font color="red">sign</font> <font color="green">dup push dup -if or - pop ; then or pop ;</font></ul>
+
+Add 2 36-bit numbers (carry mode, carry clear):<ul>
+<li><font color="red">+d</font> <font color="green">a! push a . + a! pop . + a ;</font></ul>
+
+Add a signed 18-bit number to a 36-bit number:<ul>
+<li><font color="red">+s</font> <font color="green">sign +d ;</font></ul>
+<font color="green">+s</font> can fall into <font color="green">+d</font>.
+
+<h2>Integer Multiply</h2>
+Multiply is implemented with the <font color="green">+* </font>instruction, with the multiplier in register A and multiplicand in S. It adds S to T if A0 is 1, then does a 36-bit shift of T and A right.
+
+<p>The multiplicand is often left on the stack. The carry bit is not used or changed by the <font color="green">+* </font>instruction.
+
+<p>Unsigned multiplier, signed multiplicand, 36-bit signed product:<ul>
+<li><font color="red">*</font> <font color="green">a! 0 17 for +* unext a ;</font></ul>
+
+<p>If the multiplier is signed, its high-order bit indicates a subtract:<ul>
+<li><font color="red">*</font> <font color="green">a! 0 16 for +* unext - . +* - a ;</font></ul>
+
+<p>Unsigned multiply, necessary for multiple-precision arithmetic. From Michael:<ul>
+<li>Two 18-bit unsigned numbers yield 36-bit unsigned product
+<li>If multiplicand is negative, add multiplier to high-order product
+<li><font color="red">u*</font> uu-hl <font color="green">over a! 0 8 for +* . +* unext
+<br>push -if drop pop . + a ;
+<br>then drop drop pop a ;</font>
+<li>From Greg: putting 2 <font color="green">+*</font>s inside <font color="green">unext</font> saves 9 ns</ul>
+
+<p>Multiply and add x:<ul>
+<li><font color="red">*+</font> nxn-n <font color="green">a! </font><font color="green"> 17 for +* next drop drop a ;</font></ul>
+
+<p>A faster 18-bit product can be computed from 2 numbers whose bits add up to 18; say 9 and 9. the multiplier (top of stack) is a normal right-justified unsigned integer. The signed multiplicand is expected to be left-shifted the number of bits in the multiplier. The product will be an 18-bit signed integer.<ul>
+<li><font color="red">*</font> <font color="green">a! 0 8 for +* unext ;</font></ul>
+
+<h2>Integer Divide</h2>
+This code is expects a positive double-precision dividend and a positive divisor that's been set negative, to produce a positive remainder and quotient.
+
+<p>Divide is slower than multiply, since there is no divide step instruction. In carry mode with carry undefined:<ul>
+<li><font color="red">/mod</font> hld-rq <font color="green">a! 17 for begin dup + push dup + 
+<br>dup a . + -if drop pop *next dup + ; <br>then over or or pop next dup + ; </font></ul>
+(This code is usually in a node's ROM, address 2d5.) The loop starts with a 2*d. The carry of <font color="green">a . + </font>will be used by the following <font color="green">dup + </font>, thus building the quotient in T. Carry is clear upon exit if the numbers were such as produce a reasonable result.
+
+<p>If the dividend is signed:<ul>
+<li><font color="red">-/mod</font> <font color="green">push over -if drop -d pop /mod - 1 . + ; then drop pop /mod ;</font></ul>
+
+<p>For a single-precision divide with a small quotient, this is shorter and faster, without carry:<ul>
+<li><font color="red">/mod</font> nd-rq <font color="green">a! 3ffff for dup a . + -if drop pop - ; then next</font></ul>
+The quotient is counted by <font color="green">next</font>. No <font color="green">; </font>since <font color="green">next </font>never stops (unless you divide by 0).
+
+<p>The quotient is on top, so:<ul>
+<li><font color="red">/</font> <font color="green">/mod push drop pop ;</font>
+<br><font color="red">mod</font> <font color="green">/mod drop ;</font></ul>
+
+<p><font color="green">*/</font> is a classic Forth word. It multiplies a number by a ratio. With 3 numbers on the stack, the top is the divisor. 
+The 36-bit intermediate product preserves precision:<ul>
+<li><font color="red">*/</font> <font color="green">push * pop / ;</font></ul>
+
+<h2>Integer Square-Root</h2>
+An algorithm similar to divide produces a 16-bit square-root from a 32-bit number:<ul>
+<li><font color="red">sqrt</font> <font color="green">2*d 2*d push push 0 pop <font color="#004000">10000</font>
+<br><font color="red">loop</font> if a! over 2* over - . + a . +
+<br>-if - push drop a or pop dup
+<br>then drop pop 2*d push a 2/ loop ;
+<br>then drop drop pop drop ;</font></ul>
+
+<h2>Fraction Multiply</h2>
+The simplest fractions have 17 fraction bits and a sign bit. Thus fractions from .1ffff to -1.00000 can be represented. The addend can be either fraction or integer.
+
+<p>For fractional arithmetic it's useful to define 1. In this context:<ul>
+<li><font color="red">1.</font> <font color="green">1ffff ;</font></ul>
+
+Then to convert fractions to/from decimal numbers:<ul>
+<li><font color="red">.f</font> <font color="green">1. 10000 */ ;<br>
+<font color="red">.0 </font>10000 1. */ ;</font></ul>
+
+<p>If the multiplier is positive:<ul>
+<li><font color="red">*.</font> <font color="green">a! 0 17 for *+ unext a -if drop - 2* - ; then drop 2* ;
+<br><font color="red">*.</font> * -if drop - 2* - ; then drop 2* ;</font></ul>
+
+<p>If the multiplier is signed, its high-order bit indicates a subtract:<ul>
+<li><font color="red">*.</font> <font color="green">a! 0 16 for *+ unext - . *+ - a -if drop - 2* ; then drop 2* - ;</font></ul>
+
+The most convenient fractions have 16 fraction bits, an integer bit and a sign bit. This allows 1.0000 to be represented. However, the product of 2 fractions must be less than 1.ffff.<ul>
+<li><font color="red">1.</font> <font color="green">32678 ;</font></ul>
+
+<p>16-bit code requires an additional left shift to the 17-bit code:<ul>
+<li><font color="red">*.</font> <font color="green">*.17 a 2* -if drop - 2* - ; then drop 2* ;</font></ul>
+
+<h2>Fraction Divide</h2>
+Dividing an 18-bit number by a 16-bit fraction requires expanding the dividend to 36-bits with a low-order 0:<ul>
+<li><font color="red">/.</font> <font color="green">push 0 pop / ;</font></ul>
+
+<h2>Fraction Square-Root</h2>
+<li><font color="red">sqrt.</font> <font color="green">1. * sqrt ;</font></ul>
+
+<h2>Multiple-precision Add</h2>
+Multiple-precision numbers are stored as an array in RAM, low-order at low address. The largest number is 32 words, since 2 such will fit in 64-word RAM. 2^18^32 is a large number, roughly 10^173.
+
+Set a number to 0:<ul>
+<li><font color="red">0n</font> a <font color="green">a! 0 n for dup !+ unext drop ;</font></ul>
+
+<p>With b a on the stack, b is added into a. Both addresses are discarded. <font color="green">n </font> is the number-1 of 18-bit words in such numbers. In carry mode:<ul>
+<li><font color="red">+n</font> ba <font color="green">n for push a! @+ push a pop pop a! @ . + !+ a next drop drop ;</font></ul>
+
+Defining the word <font color="green">+c </font>to add with carry, allows using ordinary <font color="green">+ </font>to increment an address, without changing the carry:<ul>
+<li><font color="#808000">+cy <font color="red">+c</font> <font color="green">+ ;</font> -cy</font>
+<br><font color="red">+n</font> ba <font color="green">a! n for dup b! @b @ +c !+ 1 + next drop ;</font></ul>

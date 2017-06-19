@@ -1,0 +1,52 @@
+<h1 align="center">Wire Nodes</h1><h3>
+
+<h2>What's a Wire Node?</h2>
+A wire node is one that passes data from one neighbor to another. It might do other work, but passing data is the concern here.
+
+<p>For example<ul>
+<li><font color="red">pass <font color="green">@ !b pass ;<font color="black"></ul>
+The A register is set to one neighbor (say left) and the B register to another (say right). This code says fetch from left, store to right and repeat indefinitely.
+
+<h2>Why Wire Nodes?</h2>
+It's best if nodes pass data to their immediate neighbors. Often nodes can be assigned so this happens. But not always.
+
+<p>In the case that inspired this document, node 36 (red video) talks <font color="green">down <font color="black">to node 26, who talks <font color="green">left <font color="black">to node 25. 25 wants to read DRAM: node 23 is the gateway to DRAM. So 25 needs to talk to 23; the only way is thru node 24. So 24 must be programmed as a wire node.
+
+<p>The point here is that node 25's function is set by proximity to red video. Node 23's function is set by proximity to nodes 13, 14 and 4. Neither can be moved.
+
+<h2>Simplex Wire Node</h2>
+A simplex node passes data in one direction. In the example above, from left to right.
+
+<p>The required code can be stored in RAM, as above. Or it can be executed from a port. The node could set its P register to execute instructions from its left port<ul>
+<font color="green">--l-<font color="black"></ul>
+One such instruction might be<ul>
+<font color="green">@p !b . .<font color="black"></ul>
+Which says fetch a number via P (currently left) and store it via B (right). Then look for another instruction (from left).
+
+<p>Or the instruction could be executed from the right port<ul>
+<font color="green">r---<font color="black"></ul>
+In which case the instruction would be<ul>
+<font color="green">@ !p . .<font color="black"></ul>
+Which says fetch a number via A (left) and store it via P (currently right). Which of these choices depends upon whether the source or destination of the data is in control.
+
+<h2>Duplex Wire Node</h2>
+A duplex node passes data in both directions: left to right and/or right to left. This is the case when talking to DRAM: an address is passed from right to left; the resulting data is returned from left to right.
+
+<p>If the protocol is fixed, say random reads, the code<ul>
+<li><font color="red">read <font color="green">@ !b @b ! read ;<font color="black"></ul>
+will do exactly that. But if some writes might be interspersed, that's not flexible enough.
+
+<p>One way is to set A to both left and right. This is possible since each direction has an address bit: left is 0010, right is 1000 and both are 1010. Then the code<ul>
+<font color="red">duplex <font color="green">@ ! duplex ;<font color="black"></ul>
+will fetch from either left or right, whichever presents data; then write to both left and write, the first one to read will get the data.
+
+<p>This is the situation that stymied me yesterday:
+25 stored the address to 24. 24 stored it to 23 and 25. But 25 started to fetch the data and received the echoed address instead. Now the process was out of phase (hung).
+
+<p>The answer is to provide delays so this doesn't happen. This can be as simple as putting <font color="green"> ! <font color="black">and <font color="green">@ <font color="black">in different instruction words, so there is an instruction fetch delay between them. The point is this must be anticipated and addressed.
+
+<p>But it can be worse: If 23 was busy and slow to respond to 24, whatever delay 25 imposed might not be enough. It could get the address and 23 never see it.
+
+<p>The bottom line is that write to multiple ports is subject to race conditions. Which must be resolved by knowledge of the application. If that can be done, this is the simplest duplex implementation.
+
+<h2>More to come</h2>

@@ -1,0 +1,106 @@
+<body bgcolor="#d0ffd0">
+Updated 2011 May<br>
+Updated 2002 September
+
+<h1>Download</h1>
+You can download <font color="red">color</font><font color="green">Forth</font> thanks to UltraTechnology.
+
+<p><font color="red">Downloads are still available. But note that COLOR.COM can only run under DOS - not Windows. As you can see above, it's 9 years old and I no longer know how to run it. The current version is available at <a href="http://greenarraychips.com/"> GreenArrays</a></font>
+
+<ul>
+<li><a href="ftp://ftp.ultratechnology.com/COLOR.COM">COLOR.COM Jul31</a>
+<li><a href="ftp://ftp.ultratechnology.com/BOOT.ASM">boot.asm, floppy source</a>
+<li><a href="ftp://ftp.ultratechnology.com/GEN.ASM">gen.asm, generic graphics source</a>
+<li><a href="ftp://ftp.ultratechnology.com/COLOR.ASM">color.asm, kernel source</a></ul>
+This is the exact version I'm using, limited only in the amount of source code provided. It's a 63KB .COM program. You're welcome to use it as you please. But it's a powerful tool, so <font color="red">please be careful.</font>
+
+<p>Current version has these improvements:<ul>
+<li>A new floppy driver:<ul>
+   <li>Does not use DMA, which cannot cross a 64K boundary.
+   <li>Uses implied seek, which restricts it to newer controllers.
+   <li>Uses Terry Loveall's e1 strobe, which seems to ease bus timing. Geof Bishop counted only 2/100 successful boots without it.</ul>
+<li>PCI graphics address<ul>
+   <li>Search for device class 3
+   <li>Search for prefetchable memory space</ul>
+<li>Bulletproof look-back optimization<ul>
+   <li>Pointer to last optimizable instruction
+   <li>Tail recursion, ; changes call to jump
+   <li>Literals<ul>
+      <li>@, !, +! with literal address
+      <li>!, +! literal to literal address
+      <li>+, or, and with literal</ul>
+   <li>When one macro ends with 'drop' and the next starts with 'dup' both may be eliminated
+   <li>Optimization is blocked by red word, then, begin (for) which imply a jump destination</ul>
+<li>Icons start at block 12, source at block 18.
+<li>Words from kernel to source: +, or, and, nip, reads, writes, save
+<li>PNG screen dump, documentation soon</ul>
+
+<p>This version runs on a PC with: 32MB RAM, PCI or AGP graphics, VESA 117 display (1024x768, rgb 565). A floppy is needed for anything but a demo. There may be graphics it won't run with. And floppies it doesn't like.
+
+<p>You must start <font color="red">COLOR</font>.COM under DOS. It is an operating system, and takes over the computer. You can then write a bootable floppy. Alternatively, Unix can copy <font color="red">COLOR</font>.COM to a bootable floppy with cp or dd.
+
+<h1>Disclaimer</h1>
+This is a reliable program.<ul>
+<li>I've used it for years
+<li>It does not access the hard drive
+<li>It has no backdoors
+<li>It does nothing unless you tell it to
+<li>But don't risk more than you can afford to lose</ul>
+
+<h1>By downloading, you agree that
+
+<p><font color="red">I am not responsible for the consequences</font></h1>
+
+<ul>
+<li>Keep backups!<ul>
+   <li>Keep a stack of at least 7 floppies (they're cheap)
+   <li>Start each day with 'save' to the oldest</ul>
+<li>Undebugged code can and will crash</ul>
+
+<h1>First time</h1><ul>
+<li>Run <font color="red">COLOR</font>.COM
+<li>Screen shows logo with keypad at lower right.
+<li>Mount a formatted floppy. Contents irrelevant.
+<li>Type 'save ' to write 162 blocks. This floppy cannot be read by DOS, no directory.</ul>
+
+<h1>Thereafter</h1><ul>
+<li>Power-up, reset or restart computer with <font color="red">color</font><font color="green">Forth</font> floppy mounted (BIOS set for bootable floppy)
+<li>Screen shows logo. 162 blocks available.</ul>
+
+<h1><a href="trouble.htm">In case of difficulty</a></h1>
+
+<h1><a href="user.htm">User guide</a></h1>
+List of included applications, with brief instructions.
+
+<h1><a href="program.htm">Programmer guide</a></h1>
+Programming tips.
+
+<h1>Platforms</h1>
+I've gotten feedback from a number of people. <font color="red">Color</font><font color="green">Forth</font> runs on some platforms and doesn't run on others. I haven't discerned any pattern. You pretty much have to download and try it on yours.
+
+<p>I'd like to recommend a current desktop PC that can run <font color="red">color</font><font color="green">Forth</font> as a dedicated platform. It should have a low price, minimal memory and no software. Gateway? Dell? Likewise a laptop. Any candidates?
+
+<h1>How <font color="red">color</font><font color="green">Forth</font> boots</h1><ul>
+<li>Boot sector loaded into low memory at 7c00
+<li>Turn off interrupts
+<li>Call BIOS to set graphics mode: 1024x768, rgb: 565
+<li>Copy itself (1 sector) to location 0
+<li>Establish 32-bit address space <font color="red">WITH NO PROTECTION!</font> All segment registers are 0, forget them.
+<li>Read 9 cylinders (162 blocks) from floppy starting at 0
+<li>Locate frame buffer<ul>
+   <li>Look at AGP device: bus 1, device 0, function 0
+   <li>Use an address in registers 9-5 if it's prefetchable
+   <li>Otherwise use the one in 4
+   <li>Comments?</ul>
+<li>Start background task building frames at 3e80000 (top of 32MB RAM).
+<li>Read block 24 to compile compiler
+<li>Await keystroke</ul>
+
+<h1>How COLOR.COM works</h1><ul>
+<li>Loaded into a segment in low memory, .COM programs are limited to 65,280 bytes (63 blocks)
+<li>Turn off interrupts
+<li>Call BIOS to set graphics mode. Only BIOS call.
+<li>Copy itself (63 blocks) to location 0
+<li>As above</ul>
+
+</body>

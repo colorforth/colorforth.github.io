@@ -1,0 +1,42 @@
+<h1>Transistor Temperature</h1>
+A transistor gets hot when it conducts current.  IV curves are measured for transistors in thermal equilibrium.  Digital transistors are cold, heating only while they switch.  These effects are noticable with a .8um process, and more important at smaller geometries.
+
+<p>Thermal properties of Silicon:<pre><b>
+         density p = 2300 kg/m3
+                     2300 fg/um3
+        capacity c = 752 J/kg K
+                     .75 fJ/fg K
+                pc = 1700 fJ/um3 K
+    conductivity k = 150 W/m K
+                     150 uW/um K
+     diffusivity a = k/pc = .088 um2/ns
+                fJ = uW ns</b></pre>
+
+The equilibrium temperature of a transistor is proportional to power<pre><b>
+     q = kS T</b></pre>
+The shape factor S depends on the geometry of the heat source and its ambient environment. It is something like 1 um, and must be calibrated.
+
+<p>The CMOS transistor IV curve must be corrected for temperature.  Current is measured as a funtion of voltage.  It varies with temperature by the
+factor<pre><b>
+     (T/(T + dT))*1.5 = 1 - 1.5 dT/T</b></pre>
+The measurement takes long enough that the transistor reaches thermal equilibrium.  To correct back to ambient, dT will be negative.  At maximum current (Vg = Vd = 5 V) this can be -75 K.  So current at ambient (294 K) can be 140% of measured, a significant change.
+
+<p>A transistor deposits heat into a portion of its channel.  The actual volume must be calibrated.  Part of this heat increases temperature and part is conducted away.<pre><b>
+     dT = a S/V (q/kS - T) dt</b></pre>
+At equilibrium there is no further change in temperature.  If current decreases below equilibrium, temperature slowly drops as 1/sqrt t. The derivative of this is proportional to T*3, so that<pre><b>
+     dT = b (T - q/kS)*3</b></pre>
+The coefficient b must be calibrated.
+
+<p>A 1-tile n-transistor deposits heat in a cylinder of volume .005 -.025 um3. This has a thermal capacity 10 - 40 fJ/K. A maximum current of 2 mA across 5 V for 8 pS sinks 80 fJ. The temperature will increase 2 - 8 K per simulator time step, say 4 K.
+
+<p>The 5 clock pulses at 2ns intervals raise the temperature of each inverter. As the clock heats, its rate slows and pulses widen.  Since it doesn't always drive the same circuits, they remain cold and see too wide a pulse.  This is very sensitive to higher voltage: both more energy and less time to dissipate. A local (cold) pulse-shaping circuit is required to offset  it.
+
+<p>An n-transistor is measured to have twice the current density of a p-transistor.  The temperature correction will be twice as great. So the ambient ratio of current density can be 3/1 at 5 V.
+
+<p>A 68-pin PLCC package has thermal resistance 50 K/W, junction to ambient. If current (excluding video output) at 5 V is 10 mA, 50 mW holds the junctions 3 K above ambient.  The transistors are 300 um from the die bottom. This is a conductance of 45 mW/K.  So the die surface is 1 K above the package which is 2 K above ambient.
+
+
+<h2>References</h2>
+Electronic Designers Handbook, McGraw-Hill 1977, p 2-127, 2-138.
+<br>Hill, Heat Conduction, Blackwell 1987.
+<br>Holman, Heat Transfer, McGraw Hill, 1972.

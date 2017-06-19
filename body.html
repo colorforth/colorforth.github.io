@@ -1,0 +1,12 @@
+<h1>Body effect</h1>
+Increasingly complex equations have been devised to account for body effect in MOS transistors. A source to body voltage is modeled as increasing threshold voltage and thus decreasing current.
+
+<p>A simple symmetry argument makes this unnecessary: Consider the current through an nMOS transistor with source at ground (Id0). Split this transistor into 2 transistors of length k and 1-k in series. The current is unchanged.  Designate the drain d and the node s:<pre><b>
+      Ids/(1-k) = Is0/k = Id0/1
+      k = Is0/Id0
+      Ids = Id0 - Is0</b></pre>
+The body effect is saying that the relevant current is between Vd and Vs on the IV curve.
+
+<p>This observation is independent of the shape of the IV curve (it applies to the linear response of a resistor). Of course, a dual effect applies to pMOS transistors. It may have implications regarding appropriate transistor models. For example, gate voltage should not be referenced to source (Vg-Vs is not a useful factor).
+
+<p>It appears that conventional body effect compensation generates too large a current for series transistors. For the level-2 SPICE model that inspired this analysis, it was about 25% high. This produces an unrealisticly fast model of NAND gate fall time.
